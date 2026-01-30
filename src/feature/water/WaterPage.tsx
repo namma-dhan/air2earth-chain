@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as Cesium from 'cesium';
 import { debounce } from 'lodash';
 import {
-  estimateRoofArea,
-  calculateWaterHarvestingPotential,
-  calculateDailyLiters,
-  createWaterPotentialIndicator
+  estimateBuildingDimensions,
+  calculateAdvancedWaterCollection,
+  createWaterPotentialIndicator,
+  type BuildingDimensions,
+  type RainParams
 } from './utils/calculations';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 
@@ -18,41 +18,74 @@ const CESIUM_ACCESS_TOKEN = (import.meta as any).env?.VITE_CESIUM_ACCESS_TOKEN |
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 const WaterPage: React.FC = () => {
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const highlightedFeatureRef = useRef<any>(null);
   const hoveredEntityRef = useRef<Cesium.Entity | null>(null);
-  const buildingDataRef = useRef<Map<string, { potential: number; liters: number; area: number }>>(new Map());
   const rainStageRef = useRef<Cesium.PostProcessStage | null>(null);
+  const isRainingRef = useRef(false);
 
   // UI State
   const [isRaining, setIsRaining] = useState(false);
+
+  // Adjustable rain parameters
   const [rainIntensity, setRainIntensity] = useState(1.0);
   const [rainAngle, setRainAngle] = useState(-0.6);
   const [rainSize, setRainSize] = useState(0.6);
   const [rainSpeed, setRainSpeed] = useState(60.0);
 
+  // Refs for shader access
+  const rainIntensityRef = useRef(rainIntensity);
+  const rainAngleRef = useRef(rainAngle);
+  const rainSizeRef = useRef(rainSize);
+  const rainSpeedRef = useRef(rainSpeed);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    rainIntensityRef.current = rainIntensity;
+    rainAngleRef.current = rainAngle;
+    rainSizeRef.current = rainSize;
+    rainSpeedRef.current = rainSpeed;
+    // Request render to update rain effect
+    if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+      viewerRef.current.scene.requestRender();
+    }
+  }, [rainIntensity, rainAngle, rainSize, rainSpeed]);
+
+  // Keep ref in sync with state for shader access
+  useEffect(() => {
+    isRainingRef.current = isRaining;
+    // Request render to update rain effect
+    if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+      viewerRef.current.scene.requestRender();
+    }
+  }, [isRaining]);
+
   // Sync atmospheric effects with rain state
   useEffect(() => {
     const viewer = viewerRef.current;
-    if (!viewer) return;
+    if (!viewer || viewer.isDestroyed()) return;
 
-    if (isRaining) {
-      const shadowDarkness = 0.3 + rainIntensity * 0.4;
-      if (viewer.scene.shadowMap) viewer.scene.shadowMap.darkness = shadowDarkness;
-      if (viewer.scene.skyAtmosphere) {
-        viewer.scene.skyAtmosphere.hueShift = 0.1 * rainIntensity;
-        viewer.scene.skyAtmosphere.saturationShift = -0.3 * rainIntensity;
-        viewer.scene.skyAtmosphere.brightnessShift = -0.2 * rainIntensity;
+    try {
+      if (isRaining) {
+        const shadowDarkness = 0.3 + rainIntensity * 0.4;
+        if (viewer.scene?.shadowMap) viewer.scene.shadowMap.darkness = shadowDarkness;
+        if (viewer.scene?.skyAtmosphere) {
+          viewer.scene.skyAtmosphere.hueShift = 0.1 * rainIntensity;
+          viewer.scene.skyAtmosphere.saturationShift = -0.3 * rainIntensity;
+          viewer.scene.skyAtmosphere.brightnessShift = -0.2 * rainIntensity;
+        }
+      } else {
+        if (viewer.scene?.shadowMap) viewer.scene.shadowMap.darkness = 0.3;
+        if (viewer.scene?.skyAtmosphere) {
+          viewer.scene.skyAtmosphere.hueShift = 0.0;
+          viewer.scene.skyAtmosphere.saturationShift = 0.0;
+          viewer.scene.skyAtmosphere.brightnessShift = 0.0;
+        }
       }
-    } else {
-      if (viewer.scene.shadowMap) viewer.scene.shadowMap.darkness = 0.3;
-      if (viewer.scene.skyAtmosphere) {
-        viewer.scene.skyAtmosphere.hueShift = 0.0;
-        viewer.scene.skyAtmosphere.saturationShift = 0.0;
-        viewer.scene.skyAtmosphere.brightnessShift = 0.0;
-      }
+    } catch (e) {
+      // Viewer may be in the process of being destroyed
+      console.warn('Could not update atmospheric effects:', e);
     }
   }, [isRaining, rainIntensity]);
 
@@ -97,10 +130,10 @@ const WaterPage: React.FC = () => {
       name: "rain_effect",
       fragmentShader: fragmentShader,
       uniforms: {
-        tiltAngle: () => rainAngle,
-        rainSize: () => rainSize,
-        rainSpeed: () => rainSpeed,
-        intensity: () => (isRaining ? rainIntensity : 0.0),
+        tiltAngle: () => rainAngleRef.current,
+        rainSize: () => rainSizeRef.current,
+        rainSpeed: () => rainSpeedRef.current,
+        intensity: () => (isRainingRef.current ? rainIntensityRef.current : 0.0),
       },
     });
 
@@ -193,37 +226,44 @@ const WaterPage: React.FC = () => {
 
           // Check if it's a feature we can analyze
           if (pickedObject instanceof Cesium.Cesium3DTileFeature) {
-            const elementId = pickedObject.getProperty("elementId");
             const height = pickedObject.getProperty("cesium#estimatedHeight") || 10;
             const levels = pickedObject.getProperty("building:levels") || Math.max(1, Math.floor(height / 3.5));
             const roofAngle = pickedObject.getProperty("roof:angle") || 0;
 
-            const buildingKey = `${elementId}`;
-            let data = buildingDataRef.current.get(buildingKey);
+            // Get building dimensions
+            const dimensions: BuildingDimensions = estimateBuildingDimensions(height, levels);
 
-            if (!data) {
-              const area = estimateRoofArea(height, levels);
-              const potential = calculateWaterHarvestingPotential(area, roofAngle);
-              const liters = calculateDailyLiters(potential, area, isRaining, rainIntensity);
-              data = { area, potential, liters };
-              buildingDataRef.current.set(buildingKey, data);
-            }
+            // Get current rain parameters
+            const rainParams: RainParams = {
+              intensity: rainIntensityRef.current,
+              angle: rainAngleRef.current,
+              size: rainSizeRef.current,
+              speed: rainSpeedRef.current
+            };
 
-            // Create Billboard
+            // Calculate advanced water collection
+            const waterData = calculateAdvancedWaterCollection(
+              dimensions,
+              rainParams,
+              isRainingRef.current,
+              roofAngle
+            );
+
+            // Create Billboard with original clean tooltip
             const tooltipPosition = Cesium.Cartesian3.clone(cartesian);
             Cesium.Cartesian3.add(tooltipPosition, new Cesium.Cartesian3(0, 0, 15), tooltipPosition);
 
             hoveredEntityRef.current = viewer.entities.add({
               position: tooltipPosition,
               billboard: {
-                image: createWaterPotentialIndicator(data.potential, data.liters),
+                image: createWaterPotentialIndicator(waterData.potential, waterData.litersPerDay),
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 scale: 0.6,
                 disableDepthTestDistance: Number.POSITIVE_INFINITY,
               },
             });
 
-            highlightBuilding(pickedObject, data.liters);
+            highlightBuilding(pickedObject, waterData.litersPerDay);
           }
         }
       } else {
@@ -250,105 +290,94 @@ const WaterPage: React.FC = () => {
     <div className="relative w-full h-full min-h-screen">
       <div ref={containerRef} className="absolute inset-0 w-full h-full bg-slate-900" />
 
-      {/* Control Panel */}
-      <div className="absolute top-5 left-5 z-10 w-72 p-5 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl text-white">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <span className="text-blue-400">💧</span> Water Analyst
-          </h1>
+      {/* Rain Controls */}
+      <div className="absolute top-5 left-5 z-10 flex flex-col gap-3">
+        {/* Start/Stop Rain Buttons */}
+        <div className="flex gap-2">
           <button
-            onClick={() => navigate('/')}
-            className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors"
+            onClick={() => setIsRaining(true)}
+            disabled={isRaining}
+            className={`py-2 px-4 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${isRaining
+              ? 'bg-gray-500 cursor-not-allowed opacity-50'
+              : 'bg-gradient-to-r from-blue-400 to-blue-600 text-white hover:-translate-y-1 active:scale-95'
+              }`}
           >
-            ← Exit
+            🌧️ Start Rain
+          </button>
+          <button
+            onClick={() => setIsRaining(false)}
+            disabled={!isRaining}
+            className={`py-2 px-4 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${!isRaining
+              ? 'bg-gray-500 cursor-not-allowed opacity-50'
+              : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 hover:-translate-y-1 active:scale-95'
+              }`}
+          >
+            ☀️ Stop Rain
           </button>
         </div>
 
-        <button
-          onClick={() => setIsRaining(!isRaining)}
-          className={`w-full py-3 px-6 mb-5 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${isRaining
-            ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900'
-            : 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
-            } hover:-translate-y-1 active:scale-95`}
-        >
-          {isRaining ? '☀️ Stop Simulation' : '🌧️ Start Rainfall'}
-        </button>
-
-        {isRaining && (
-          <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold uppercase tracking-wider opacity-70">
-                Intensity: {rainIntensity.toFixed(1)}
-              </label>
-              <input
-                type="range"
-                min="0.1"
-                max="2.0"
-                step="0.1"
-                value={rainIntensity}
-                onChange={(e) => setRainIntensity(parseFloat(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-400"
-              />
-              <div className="flex justify-between text-[10px] opacity-50">
-                <span>Mist</span>
-                <span>Downpour</span>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold uppercase tracking-wider opacity-70">
-                Wind Angle: {rainAngle.toFixed(1)}
-              </label>
-              <input
-                type="range"
-                min="-1.5"
-                max="1.5"
-                step="0.1"
-                value={rainAngle}
-                onChange={(e) => setRainAngle(parseFloat(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-400"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold uppercase tracking-wider opacity-70">
-                Drop Size: {rainSize.toFixed(1)}
-              </label>
-              <input
-                type="range"
-                min="0.1"
-                max="1.0"
-                step="0.1"
-                value={rainSize}
-                onChange={(e) => setRainSize(parseFloat(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-400"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold uppercase tracking-wider opacity-70">
-                Fall Speed: {rainSpeed.toFixed(0)}
-              </label>
-              <input
-                type="range"
-                min="20"
-                max="120"
-                step="10"
-                value={rainSpeed}
-                onChange={(e) => setRainSpeed(parseFloat(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-400"
-              />
-            </div>
+        {/* Rain Parameter Sliders */}
+        <div className="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl text-white space-y-3">
+          <div>
+            <label className="text-xs text-white/80 flex justify-between">
+              <span>Intensity</span>
+              <span>{rainIntensity.toFixed(2)}</span>
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="2.0"
+              step="0.1"
+              value={rainIntensity}
+              onChange={(e) => setRainIntensity(parseFloat(e.target.value))}
+              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
           </div>
-        )}
-
-        <div className="mt-6 p-3 bg-white/5 rounded-lg border border-white/10 text-xs opacity-80">
-          <p className="mb-2"><strong>Instructions:</strong></p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Hover over buildings to analyze.</li>
-            <li>Buildings are color-coded by yield.</li>
-            <li>Rain intensity impacts potential.</li>
-          </ul>
+          <div>
+            <label className="text-xs text-white/80 flex justify-between">
+              <span>Angle</span>
+              <span>{rainAngle.toFixed(2)}</span>
+            </label>
+            <input
+              type="range"
+              min="-1.5"
+              max="1.5"
+              step="0.1"
+              value={rainAngle}
+              onChange={(e) => setRainAngle(parseFloat(e.target.value))}
+              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-white/80 flex justify-between">
+              <span>Size</span>
+              <span>{rainSize.toFixed(2)}</span>
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="2.0"
+              step="0.1"
+              value={rainSize}
+              onChange={(e) => setRainSize(parseFloat(e.target.value))}
+              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-white/80 flex justify-between">
+              <span>Speed</span>
+              <span>{rainSpeed.toFixed(0)}</span>
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="120"
+              step="5"
+              value={rainSpeed}
+              onChange={(e) => setRainSpeed(parseFloat(e.target.value))}
+              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+          </div>
         </div>
       </div>
 
