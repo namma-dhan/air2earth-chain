@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
-import AqiPage from './pages/AqiPage';
-import SolarPage from './pages/SolarPage';
-import WaterPage from './pages/WaterPage';
+import AqiPage from './feature/aqi/AqiPage';
+import SolarPage from './feature/solar/SolarPage';
+import WaterPage from './feature/water/WaterPage';
 
 function App() {
   return (
