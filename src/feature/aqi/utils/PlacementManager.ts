@@ -19,15 +19,15 @@ export const TOOLS: Record<ToolType, ToolConfig> = {
         name: 'Trees',
         subtitle: 'Place on map',
         // Placeholder model URL - user should replace this
-        modelUrl: '/assets/tree1.glb',
+        modelUrl: '/assets/aqi/tree1.glb',
         scale: 1.5, // Tree size
         heightOffset: 0,
     },
     garden: {
         id: 'garden',
         name: 'Vertical Gardens',
-        subtitle: 'Green walls',
-        modelUrl: '/assets/vertical-garden.glb',
+        subtitle: 'Click building to paint',
+        modelUrl: undefined, // No model
         scale: 3.0,
         heightOffset: 0,
     },
@@ -63,6 +63,9 @@ export class PlacementManager {
         pickEntity?: Cesium.Entity; // Invisible entity for picking
     }[] = [];
 
+    // Storage for painted buildings
+    private paintedBuildingIds: Set<string> = new Set();
+
     constructor(viewer: Cesium.Viewer) {
         this.viewer = viewer;
         this.placedInstances = new Cesium.PrimitiveCollection();
@@ -91,18 +94,21 @@ export class PlacementManager {
             this.viewer.scene.screenSpaceCameraController.enableZoom = false;
         }
 
-        // Create Ghost Entity (Preview)
-        // We use an Entity for the ghost because it's easier to update position reactively
-        this.ghostEntity = this.viewer.entities.add({
-            model: {
-                uri: config.modelUrl,
-                scale: config.scale,
-                color: Cesium.Color.WHITE.withAlpha(0.7), // Semi-transparent
-                colorBlendMode: Cesium.ColorBlendMode.MIX,
-                colorBlendAmount: 0.5,
-                heightReference: tool === 'garden' ? Cesium.HeightReference.NONE : Cesium.HeightReference.CLAMP_TO_GROUND
-            }
-        });
+        // Create Ghost Entity (Preview) - Only if modelUrl serves a model
+        // For garden painting, we don't need a ghost model
+        if (config.modelUrl) {
+            // We use an Entity for the ghost because it's easier to update position reactively
+            this.ghostEntity = this.viewer.entities.add({
+                model: {
+                    uri: config.modelUrl,
+                    scale: config.scale,
+                    color: Cesium.Color.WHITE.withAlpha(0.7), // Semi-transparent
+                    colorBlendMode: Cesium.ColorBlendMode.MIX,
+                    colorBlendAmount: 0.5,
+                    heightReference: tool === 'garden' ? Cesium.HeightReference.NONE : Cesium.HeightReference.CLAMP_TO_GROUND
+                }
+            });
+        }
 
         // Setup Interaction Handler
         this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
@@ -110,6 +116,8 @@ export class PlacementManager {
         // MOUSE MOVE: Update Ghost Position
         this.handler.setInputAction((movement: Cesium.ScreenSpaceEventHandler.MotionEvent) => {
             const position = this.getPickPosition(movement.endPosition);
+            
+            // Update ghost if exists
             if (position && this.ghostEntity) {
                 this.currentPosition = position;
                 this.ghostEntity.position = new Cesium.ConstantPositionProperty(position);
@@ -317,21 +325,93 @@ export class PlacementManager {
         return position;
     }
 
-    private async placeInstance(position: Cesium.Cartesian3) {
+    // Helper to get surface normal at a screen position
+
+    private async placeInstance(position: Cesium.Cartesian3, headingOverride?: number) {
+        if (!this.activeTool) return;
+
+        // GARDEN LOGIC: Paint the building feature
+        if (this.activeTool === 'garden') {
+             this.paintBuildingFeature(position);
+             return;
+        }
+
+        const effectiveHeading = headingOverride !== undefined 
+            ? headingOverride
+            : Cesium.Math.toRadians(0);
+
+        await this.createPlacement(position, effectiveHeading);
+    }
+
+    private paintBuildingFeature(position: Cesium.Cartesian3) {
+        // We need to pick the feature at the position
+        const canvasPosition = Cesium.SceneTransforms.worldToWindowCoordinates(this.viewer.scene, position);
+        if (!canvasPosition) return;
+
+        const pickedObject = this.viewer.scene.pick(canvasPosition);
+        
+        if (Cesium.defined(pickedObject) && pickedObject instanceof Cesium.Cesium3DTileFeature) {
+            // Get a unique ID for the building. 'elementId' is common for OSM buildings.
+            // Fallback to pickId if elementId is not available (though pickId is transient)
+            // Ideally we want something persistent like 'id', 'name', or 'elementId'
+            const featureId = pickedObject.getProperty('elementId') 
+                              || pickedObject.getProperty('id') 
+                              || pickedObject.getProperty('name');
+
+            if (!featureId) {
+                console.warn('Building has no ID to persist painting. Applying temporary color.');
+                pickedObject.color = Cesium.Color.fromCssColorString('#2E8B57').withAlpha(0.95);
+                return;
+            }
+
+            // Add to our set of painted buildings
+            const strId = String(featureId);
+            this.paintedBuildingIds.add(strId);
+            console.log(`Painted building ${strId}. Total painted: ${this.paintedBuildingIds.size}`);
+
+            // Apply style to the tileset to persist the color
+            const tileset = pickedObject.tileset;
+            
+            // Construct the style condition
+            // logic: if (elementId === 'A' || elementId === 'B' ...) { color: green }
+            
+            const idList = Array.from(this.paintedBuildingIds).map(id => {
+                // Check if id is numeric string
+                if (/^\d+$/.test(id)) {
+                    return `\${elementId} === ${id}`;
+                }
+                return `\${elementId} === '${id}'`;
+            });
+            
+            const colorCondition = idList.join(' || ');
+            
+            if (colorCondition) {
+                tileset.style = new Cesium.Cesium3DTileStyle({
+                    color: {
+                        conditions: [
+                            [colorCondition, "color('#2E8B57', 0.95)"],
+                            ['true', 'color("#ffffff")'] // Default color (white/original)
+                        ]
+                    }
+                });
+            }
+
+        } else {
+            console.warn('No building feature found to paint at this location.');
+        }
+    }
+
+    private async createPlacement(position: Cesium.Cartesian3, heading: number) {
         if (!this.activeTool) return;
         const config = TOOLS[this.activeTool];
-
+        
         // Check minimum distance between placements (5 meters for trees, 2 meters for gardens)
         const minDistance = this.activeTool === 'tree' ? 5 : (this.activeTool === 'garden' ? 2 : 20);
         if (this.isTooCloseToOthers(position, minDistance)) {
-            console.warn('Too close to another placement. Minimum distance:', minDistance, 'meters');
+            // console.warn('Too close to another placement. Minimum distance:', minDistance, 'meters');
             return;
         }
 
-        // Use current rotation for gardens, 0 for others
-        const heading = this.activeTool === 'garden' 
-            ? Cesium.Math.toRadians(this.currentRotation) 
-            : Cesium.Math.toRadians(0);
         const pitch = 0;
         const roll = 0;
         const hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
@@ -349,7 +429,7 @@ export class PlacementManager {
         const pickEntity = this.viewer.entities.add({
             position: position,
             box: {
-                dimensions: new Cesium.Cartesian3(30, 30, 30),
+                dimensions: new Cesium.Cartesian3(config.scale * 2, config.scale * 2, config.scale * 4), // Approximate bounding box
                 material: Cesium.Color.RED.withAlpha(0)
             }
         });
@@ -359,6 +439,9 @@ export class PlacementManager {
         try {
             const modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr);
 
+            // Special handling for gardens to make them flush with wall if possible
+            // For now, we assume standard orientation
+            
             const model = await Cesium.Model.fromGltfAsync({
                 url: config.modelUrl || '',
                 modelMatrix: modelMatrix,
@@ -369,9 +452,6 @@ export class PlacementManager {
             
             // Store model reference for deletion
             this.placements[placementIndex].model = model;
-
-            // Console animation/log
-            console.log(`Placed ${config.name} at`, position, `rotation: ${this.currentRotation}°`);
 
         } catch (error) {
             console.error("Failed to place model. Fallback to placeholder box.", error);
@@ -390,4 +470,5 @@ export class PlacementManager {
             this.placements[placementIndex].entity = entity;
         }
     }
+
 }
