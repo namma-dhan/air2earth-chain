@@ -1,16 +1,11 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-
-@theme {
-  --font-display: 'Inter', system-ui, sans-serif;
-  --letter-spacing-ultra-wide: 0.2em;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   body {
-    font-family: var(--font-display);
-    background-color: #020617;
-    color: #f1f5f9;
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #ffffff;
+    color: #166534;
     margin: 0;
     padding: 0;
     min-height: 100vh;
