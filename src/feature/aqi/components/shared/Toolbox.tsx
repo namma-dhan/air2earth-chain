@@ -74,12 +74,12 @@ export const Toolbox: React.FC<ToolboxProps> = ({ viewer }) => {
             {activeToolId && (
                 <div className="toolbox-status">
                     Placing: <strong>{TOOLS[activeToolId].name}</strong>
-                    {activeToolId === 'garden' && (
-                        <span className="rotation-indicator"> | Rotation: {currentRotation}°</span>
+                    {activeToolId !== 'garden' && (
+                         <span className="rotation-indicator"> | Rotation: {currentRotation}°</span>
                     )}
                     <small>
                         {activeToolId === 'garden'
-                            ? '(Scroll to rotate • Right-click / Esc to cancel)'
+                            ? '(Click to paint • Right-click / Esc to cancel)'
                             : '(Right-click / Esc to cancel)'}
                     </small>
                 </div>
