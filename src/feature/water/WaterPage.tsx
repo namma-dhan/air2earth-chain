@@ -8,7 +8,7 @@ import {
   calculateDailyLiters,
   createWaterPotentialIndicator
 } from './utils/calculations';
-import 'cesium/Widgets/widgets.css';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
 // For many sandbox environments, we can rely on standard imports.
