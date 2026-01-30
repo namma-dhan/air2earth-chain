@@ -4,6 +4,7 @@ import AqiPage from './feature/aqi/AqiPage';
 import SolarPage from './feature/solar/SolarPage';
 import WaterPage from './feature/water/WaterPage';
 
+// dei poda
 function App() {
   return (
     <Router>
