@@ -1,7 +1,7 @@
 // Station popup component for AQI details
 import React from 'react';
-import type { StationData } from '../types';
-import { getAqiInfo } from '../utils';
+import type { StationData } from '../aqi-types';
+import { getAqiInfo } from '../aqi-utils';
 
 interface StationPopupProps {
   station: StationData;
