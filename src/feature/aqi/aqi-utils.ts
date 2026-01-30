@@ -1,6 +1,6 @@
 // AQI utility functions
 import * as Cesium from 'cesium';
-import type { AqiInfo } from './types';
+import type { AqiInfo } from './aqi-types';
 
 // Get AQI color as RGB values
 export function getAqiRGB(aqi: number): [number, number, number] {
