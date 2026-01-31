@@ -285,6 +285,35 @@ function AqiCesiumApp() {
     };
   }, [handlePlacementCompleted]);
 
+  // Listen for VR mode exit to restore shaders
+  useEffect(() => {
+    const handleVRModeExit = () => {
+      console.log('[AqiCesiumApp] VR mode exited, restoring shaders');
+      if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+        const v = viewerRef.current;
+        // Recalculate average AQI
+        const avgAqi = aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
+        
+        // Recreate shaders (they were removed during VR optimization)
+        try {
+          // Only recreate if they don't exist
+          if (!windStageRef.current || v.scene.postProcessStages.length === 0) {
+            createWindStage(v);
+            createPollutionStage(v, avgAqi);
+          }
+        } catch (e) {
+          console.warn('[AqiCesiumApp] Could not restore shaders:', e);
+        }
+      }
+      setIsVRMode(false);
+    };
+
+    window.addEventListener('vr-mode-exit', handleVRModeExit);
+    return () => {
+      window.removeEventListener('vr-mode-exit', handleVRModeExit);
+    };
+  }, []);
+
   const closeImpactPopup = useCallback(() => {
     setCurrentImpact(null);
     setImpactPosition(null);

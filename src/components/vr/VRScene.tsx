@@ -11,12 +11,19 @@ interface OriginalSettings {
   fov: number;
   resolutionScale: number;
   maximumScreenSpaceError: number;
+  useDefaultRenderLoop: boolean;
+  targetFrameRate: number;
+  requestRenderMode: boolean;
 }
 
 /**
  * ImmersiveVRScene - Optimized VR mode for Quest compatibility
  * 
- * Reduces scene complexity to prevent browser crashes on mobile VR.
+ * Uses a lightweight approach to prevent browser crashes on mobile VR:
+ * - Disables Cesium's default render loop
+ * - Implements a manual, throttled render loop
+ * - Aggressively reduces scene complexity
+ * - Yields to browser regularly to prevent "not responding" errors
  */
 export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onExitVR }) => {
   const [isActive, setIsActive] = useState(false);
@@ -24,6 +31,8 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
   const xrSessionRef = useRef<XRSession | null>(null);
   const originalSettingsRef = useRef<OriginalSettings | null>(null);
   const animationIdRef = useRef<number | null>(null);
+  const isRenderingRef = useRef(false);
+  const lastRenderTimeRef = useRef(0);
 
   // Optimize scene for VR performance
   const optimizeForVR = useCallback((v: Cesium.Viewer) => {
@@ -36,33 +45,64 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
       fov: frustum instanceof Cesium.PerspectiveFrustum ? (frustum.fov ?? Cesium.Math.toRadians(60)) : Cesium.Math.toRadians(60),
       resolutionScale: v.resolutionScale,
       maximumScreenSpaceError: v.scene.globe.maximumScreenSpaceError,
+      useDefaultRenderLoop: v.useDefaultRenderLoop,
+      targetFrameRate: v.targetFrameRate,
+      requestRenderMode: v.scene.requestRenderMode,
     };
 
     // Apply VR optimizations
     setStatusMessage('Optimizing scene...');
 
-    // 1. Reduce resolution for better performance (Quest browser has limited resources)
-    v.resolutionScale = 0.65;
+    // CRITICAL: Stop Cesium's default render loop to prevent conflicts
+    v.useDefaultRenderLoop = false;
 
-    // 2. Disable all post-processing (wind, pollution shaders are GPU intensive)
+    // 1. Very low resolution for Quest browser (mobile GPU)
+    v.resolutionScale = 0.5;
+
+    // 2. Disable ALL post-processing (wind, pollution shaders are GPU intensive)
     v.scene.postProcessStages.removeAll();
 
-    // 3. Reduce 3D tileset detail (higher error = lower detail = better performance)
-    v.scene.globe.maximumScreenSpaceError = 6;
+    // 3. Aggressively reduce 3D tileset detail
+    v.scene.globe.maximumScreenSpaceError = 8;
 
     // 4. Wider FOV for VR
     if (frustum instanceof Cesium.PerspectiveFrustum) {
       frustum.fov = Cesium.Math.toRadians(100);
     }
 
-    // 5. Disable shadows if enabled
+    // 5. Disable shadows
     v.shadows = false;
 
-    // 6. Disable fog for performance
+    // 6. Disable fog
     v.scene.fog.enabled = false;
 
-    // Force a render to apply changes
-    v.scene.requestRender();
+    // 7. Disable atmosphere effects (heavy on GPU)
+    if (v.scene.skyAtmosphere) {
+      v.scene.skyAtmosphere.show = false;
+    }
+
+    // 8. Reduce globe detail
+    v.scene.globe.tileCacheSize = 50;
+    v.scene.globe.preloadSiblings = false;
+    v.scene.globe.preloadAncestors = false;
+
+    // 9. Lower 3D tiles memory budget
+    try {
+      const primitives = v.scene.primitives as unknown as { length: number; get: (i: number) => unknown };
+      for (let i = 0; i < primitives.length; i++) {
+        const primitive = primitives.get(i);
+        if (primitive && typeof primitive === 'object' && 'maximumMemoryUsage' in primitive) {
+          (primitive as { maximumMemoryUsage: number }).maximumMemoryUsage = 128;
+        }
+      }
+    } catch (e) {
+      // Ignore if primitives cannot be accessed
+    }
+
+    // 10. Enable request render mode (only render when needed)
+    v.scene.requestRenderMode = true;
+
+    console.log('[VRScene] Scene optimized for VR');
   }, []);
 
   // Restore original settings
@@ -71,11 +111,17 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
 
     const settings = originalSettingsRef.current;
 
+    // Restore render loop FIRST
+    v.useDefaultRenderLoop = settings.useDefaultRenderLoop;
+
     // Restore resolution
     v.resolutionScale = settings.resolutionScale;
 
     // Restore globe detail
     v.scene.globe.maximumScreenSpaceError = settings.maximumScreenSpaceError;
+    v.scene.globe.tileCacheSize = 100;
+    v.scene.globe.preloadSiblings = true;
+    v.scene.globe.preloadAncestors = true;
 
     // Restore FOV
     const frustum = v.camera.frustum as Cesium.PerspectiveFrustum;
@@ -87,13 +133,25 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
     // Re-enable fog
     v.scene.fog.enabled = true;
 
+    // Re-enable atmosphere
+    if (v.scene.skyAtmosphere) {
+      v.scene.skyAtmosphere.show = true;
+    }
+
+    // Restore render mode
+    v.scene.requestRenderMode = settings.requestRenderMode;
+
     // Dispatch event so parent can restore post-processing shaders
     window.dispatchEvent(new CustomEvent('vr-mode-exit'));
 
     v.scene.requestRender();
+    console.log('[VRScene] Settings restored');
   }, []);
 
   const exitVR = useCallback(async () => {
+    console.log('[VRScene] Exiting VR mode');
+    isRenderingRef.current = false;
+
     // End XR session if active
     if (xrSessionRef.current) {
       try {
@@ -130,10 +188,13 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
         // First optimize the scene for VR
         optimizeForVR(viewer);
 
+        // Wait a frame to let optimizations apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         // Check if WebXR is available
         if ('xr' in navigator) {
           setStatusMessage('Checking VR support...');
-          const xr = (navigator as any).xr;
+          const xr = (navigator as Navigator & { xr: XRSystem }).xr;
           const supported = await xr.isSessionSupported('immersive-vr');
           
           if (supported) {
@@ -149,43 +210,125 @@ export const ImmersiveVRScene: React.FC<ImmersiveVRSceneProps> = ({ viewer, onEx
 
               // Handle session end
               session.addEventListener('end', () => {
+                console.log('[VRScene] XR session ended');
                 xrSessionRef.current = null;
                 exitVR();
               });
 
-              // Lightweight XR frame loop - minimal work per frame
-              const onXRFrame = (_time: DOMHighResTimeStamp, _frame: XRFrame) => {
-                if (xrSessionRef.current) {
-                  xrSessionRef.current.requestAnimationFrame(onXRFrame);
-                }
-              };
+              // Start our throttled VR render loop
+              isRenderingRef.current = true;
+              startVRRenderLoop(viewer, session);
               
-              session.requestAnimationFrame(onXRFrame);
               setIsActive(true);
+              console.log('[VRScene] VR session started successfully');
               
             } catch (e) {
-              console.log('Could not start immersive VR, using fallback mode');
+              console.log('[VRScene] Could not start immersive VR:', e);
+              // Fallback: just enable optimized view without XR
+              startOptimizedRenderLoop(viewer);
               setIsActive(true);
             }
           } else {
             // Fallback: just enable optimized view
             setStatusMessage('VR not supported, using optimized view');
+            startOptimizedRenderLoop(viewer);
             setIsActive(true);
           }
         } else {
-          // No WebXR, use simple fullscreen mode
+          // No WebXR, use simple optimized mode
           setStatusMessage('Entering optimized view...');
+          startOptimizedRenderLoop(viewer);
           setIsActive(true);
         }
       } catch (error) {
-        console.error('VR initialization error:', error);
+        console.error('[VRScene] VR initialization error:', error);
+        if (viewer && !viewer.isDestroyed()) {
+          startOptimizedRenderLoop(viewer);
+        }
         setIsActive(true);
       }
+    };
+
+    // Throttled render loop for VR - yields to browser frequently
+    const startVRRenderLoop = (v: Cesium.Viewer, session: XRSession) => {
+      const TARGET_FPS = 30; // Target 30fps for Quest browser stability
+      const FRAME_INTERVAL = 1000 / TARGET_FPS;
+      let frameCount = 0;
+
+      const onXRFrame = (time: DOMHighResTimeStamp, _frame: XRFrame) => {
+        if (!isRenderingRef.current || !xrSessionRef.current || v.isDestroyed()) {
+          return;
+        }
+
+        // Request next frame FIRST to maintain loop
+        session.requestAnimationFrame(onXRFrame);
+
+        // Throttle rendering to reduce GPU load
+        const elapsed = time - lastRenderTimeRef.current;
+        if (elapsed < FRAME_INTERVAL) {
+          return;
+        }
+        lastRenderTimeRef.current = time;
+
+        // Every 30 frames, yield to browser with a minimal timeout
+        // This prevents "browser not responding" on Quest
+        frameCount++;
+        if (frameCount % 30 === 0) {
+          setTimeout(() => {
+            if (!v.isDestroyed() && isRenderingRef.current) {
+              try {
+                v.render();
+              } catch (e) {
+                console.warn('[VRScene] Render error:', e);
+              }
+            }
+          }, 0);
+        } else {
+          // Normal render
+          try {
+            v.render();
+          } catch (e) {
+            console.warn('[VRScene] Render error:', e);
+          }
+        }
+      };
+      
+      session.requestAnimationFrame(onXRFrame);
+    };
+
+    // Optimized render loop for non-VR fallback
+    const startOptimizedRenderLoop = (v: Cesium.Viewer) => {
+      const TARGET_FPS = 30;
+      const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
+      const render = (time: DOMHighResTimeStamp) => {
+        if (!isRenderingRef.current || v.isDestroyed()) {
+          return;
+        }
+
+        animationIdRef.current = requestAnimationFrame(render);
+
+        const elapsed = time - lastRenderTimeRef.current;
+        if (elapsed < FRAME_INTERVAL) {
+          return;
+        }
+        lastRenderTimeRef.current = time;
+
+        try {
+          v.render();
+        } catch (e) {
+          console.warn('[VRScene] Render error:', e);
+        }
+      };
+
+      isRenderingRef.current = true;
+      animationIdRef.current = requestAnimationFrame(render);
     };
 
     initVR();
 
     return () => {
+      isRenderingRef.current = false;
       if (xrSessionRef.current) {
         xrSessionRef.current.end().catch(() => {});
       }

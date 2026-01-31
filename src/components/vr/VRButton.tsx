@@ -24,6 +24,16 @@ export const VRButton: React.FC<VRButtonProps> = ({ className = '', onEnterVR, o
       }
     };
     checkVRSupport();
+
+    // Listen for VR mode exit to sync button state
+    const handleVRModeExit = () => {
+      setIsInVR(false);
+    };
+    window.addEventListener('vr-mode-exit', handleVRModeExit);
+    
+    return () => {
+      window.removeEventListener('vr-mode-exit', handleVRModeExit);
+    };
   }, []);
 
   const handleClick = () => {
