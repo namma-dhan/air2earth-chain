@@ -12,12 +12,14 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/lodash": "^4.17.23",
+    "@types/three": "^0.182.0",
     "cesium": "^1.137.0",
     "lodash": "^4.17.23",
     "normalize.css": "^8.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

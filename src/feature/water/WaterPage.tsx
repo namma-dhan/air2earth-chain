@@ -8,6 +8,7 @@ import {
   type BuildingDimensions,
   type RainParams
 } from './utils/calculations';
+import { setupCesiumVR } from '../../utils/CesiumVR';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
@@ -24,6 +25,7 @@ const WaterPage: React.FC = () => {
   const hoveredEntityRef = useRef<Cesium.Entity | null>(null);
   const rainStageRef = useRef<Cesium.PostProcessStage | null>(null);
   const isRainingRef = useRef(false);
+  const vrDisposeRef = useRef<(() => void) | null>(null);
 
   // UI State
   const [isRaining, setIsRaining] = useState(false);
@@ -160,7 +162,7 @@ const WaterPage: React.FC = () => {
 
     const viewer = new Cesium.Viewer(containerRef.current, {
       terrain: Cesium.Terrain.fromWorldTerrain(),
-      vrButton: true,
+      vrButton: false, // Disable Cesium's VR button, we use Three.js VRButton
       animation: false,
       timeline: false,
       navigationHelpButton: false,
@@ -168,6 +170,7 @@ const WaterPage: React.FC = () => {
       baseLayerPicker: false,
       geocoder: false,
       homeButton: false,
+      useDefaultRenderLoop: false, // Disable default render loop for WebXR control
       // @ts-ignore
       shouldAnimate: true
     });
@@ -209,6 +212,18 @@ const WaterPage: React.FC = () => {
     viewer.clock.shouldAnimate = false;
 
     createRainStage(viewer);
+
+    // Setup WebXR VR support using Three.js
+    const { vrButton, dispose } = setupCesiumVR(viewer);
+    vrDisposeRef.current = dispose;
+
+    // Style and position the VR button
+    vrButton.style.position = 'absolute';
+    vrButton.style.bottom = '20px';
+    vrButton.style.left = '50%';
+    vrButton.style.transform = 'translateX(-50%)';
+    vrButton.style.zIndex = '100';
+    containerRef.current.appendChild(vrButton);
 
     // Mouse Move Handler
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -282,6 +297,9 @@ const WaterPage: React.FC = () => {
 
     return () => {
       handler.destroy();
+      if (vrDisposeRef.current) {
+        vrDisposeRef.current();
+      }
       viewer.destroy();
     };
   }, [highlightBuilding]);
@@ -436,7 +454,7 @@ const WaterPage: React.FC = () => {
           </div>
 
           {/* Get Quote Button */}
-          <button 
+          <button
             onClick={() => alert(`Quote Request:\n- Rain Intensity: ${rainIntensity.toFixed(1)}x\n- Angle: ${rainAngle.toFixed(2)}\n- Est. Collection: ${Math.round(rainIntensity * 2500)} L/day\n\nOur team will contact you shortly!`)}
             className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/20"
           >
