@@ -219,6 +219,31 @@ function AqiCesiumApp() {
   const [impactPosition, setImpactPosition] = useState<{ x: number; y: number } | null>(null);
   const [allImpacts, setAllImpacts] = useState<ImpactData[]>([]);
 
+  // Wind & Pollution simulation state
+  const [showWind, setShowWind] = useState(false);
+  const [windSpeed, setWindSpeed] = useState(8.0); // m/s
+  const [windDirection, setWindDirection] = useState(45); // degrees
+  const [showPollution, setShowPollution] = useState(true);
+  
+  // Refs for shader access
+  const showWindRef = useRef(showWind);
+  const windSpeedRef = useRef(windSpeed);
+  const windDirectionRef = useRef(windDirection);
+  const showPollutionRef = useRef(showPollution);
+  const windStageRef = useRef<Cesium.PostProcessStage | null>(null);
+  const pollutionStageRef = useRef<Cesium.PostProcessStage | null>(null);
+
+  // Keep refs in sync
+  useEffect(() => {
+    showWindRef.current = showWind;
+    windSpeedRef.current = windSpeed;
+    windDirectionRef.current = windDirection;
+    showPollutionRef.current = showPollution;
+    if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+      viewerRef.current.scene.requestRender();
+    }
+  }, [showWind, windSpeed, windDirection, showPollution]);
+
   // Handle placement completed events from PlacementManager
   const handlePlacementCompleted = useCallback((event: CustomEvent<{ 
     tool: string; 
@@ -266,6 +291,122 @@ function AqiCesiumApp() {
   const handleGetQuote = useCallback(() => {
     alert('Quote request submitted! Our team will contact you shortly.');
   }, []);
+
+  // Create Wind Particle Shader
+  const createWindStage = (viewer: Cesium.Viewer) => {
+    const fragmentShader = `
+      uniform sampler2D colorTexture;
+      uniform float windSpeed;
+      uniform float windDirection;
+      uniform float intensity;
+      
+      in vec2 v_textureCoordinates;
+
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+
+      void main(void) {
+        float time = czm_frameNumber / 60.0;
+        vec2 resolution = czm_viewport.zw;
+        vec2 uv = gl_FragCoord.xy / resolution;
+        
+        // Wind direction in radians
+        float angle = windDirection * 3.14159 / 180.0;
+        vec2 windDir = vec2(cos(angle), sin(angle));
+        
+        // Create streaming dust particles
+        vec2 movingUV = uv * 20.0 - windDir * time * windSpeed * 0.5;
+        float dust = noise(movingUV) * noise(movingUV * 2.0 + time);
+        dust = pow(dust, 3.0) * 0.3;
+        
+        // Streaky wind lines
+        float streak = noise(vec2(uv.x * 100.0 + time * windSpeed, uv.y * 5.0));
+        streak = pow(streak, 8.0) * 0.15;
+        
+        vec3 windColor = vec3(0.8, 0.75, 0.65) * (dust + streak) * intensity;
+        
+        vec4 originalColor = texture(colorTexture, v_textureCoordinates);
+        out_FragColor = vec4(originalColor.rgb + windColor, originalColor.a);
+      }
+    `;
+
+    const stage = new Cesium.PostProcessStage({
+      name: "wind_effect",
+      fragmentShader: fragmentShader,
+      uniforms: {
+        windSpeed: () => windSpeedRef.current,
+        windDirection: () => windDirectionRef.current,
+        intensity: () => (showWindRef.current ? 1.0 : 0.0),
+      },
+    });
+
+    viewer.scene.postProcessStages.add(stage);
+    windStageRef.current = stage;
+  };
+
+  // Create Pollution Haze Shader
+  const createPollutionStage = (viewer: Cesium.Viewer, avgAqi: number) => {
+    const fragmentShader = `
+      uniform sampler2D colorTexture;
+      uniform float aqiLevel;
+      uniform float intensity;
+      
+      in vec2 v_textureCoordinates;
+
+      vec3 getAqiColor(float aqi) {
+        if (aqi <= 50.0) return vec3(0.0, 0.9, 0.0);       // Good - Green
+        if (aqi <= 100.0) return vec3(1.0, 1.0, 0.0);      // Moderate - Yellow
+        if (aqi <= 150.0) return vec3(1.0, 0.5, 0.0);      // Unhealthy Sensitive - Orange
+        if (aqi <= 200.0) return vec3(1.0, 0.0, 0.0);      // Very Unhealthy - Red
+        return vec3(0.56, 0.25, 0.6);                       // Hazardous - Purple
+      }
+
+      void main(void) {
+        vec4 originalColor = texture(colorTexture, v_textureCoordinates);
+        
+        if (intensity < 0.01) {
+          out_FragColor = originalColor;
+          return;
+        }
+        
+        vec3 pollutionColor = getAqiColor(aqiLevel);
+        float hazeAmount = clamp(aqiLevel / 400.0, 0.0, 0.35) * intensity;
+        
+        // Add slight desaturation for pollution effect
+        float gray = dot(originalColor.rgb, vec3(0.299, 0.587, 0.114));
+        vec3 desaturated = mix(originalColor.rgb, vec3(gray), hazeAmount * 0.5);
+        
+        // Blend with pollution color
+        vec3 finalColor = mix(desaturated, pollutionColor, hazeAmount * 0.4);
+        
+        out_FragColor = vec4(finalColor, originalColor.a);
+      }
+    `;
+
+    const stage = new Cesium.PostProcessStage({
+      name: "pollution_haze",
+      fragmentShader: fragmentShader,
+      uniforms: {
+        aqiLevel: () => avgAqi,
+        intensity: () => (showPollutionRef.current ? 1.0 : 0.0),
+      },
+    });
+
+    viewer.scene.postProcessStages.add(stage);
+    pollutionStageRef.current = stage;
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -327,6 +468,13 @@ function AqiCesiumApp() {
         });
 
         console.log('3D OSM Buildings loaded with AQI styling');
+
+        // Calculate average AQI for pollution shader
+        const avgAqi = aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
+
+        // Initialize wind and pollution shaders
+        createWindStage(viewer);
+        createPollutionStage(viewer, avgAqi);
       } catch (err) {
         console.error('Failed to load 3D buildings:', err);
       }
@@ -627,6 +775,79 @@ function AqiCesiumApp() {
           <span>201+: Hazardous</span>
         </div>
       </div>
+
+      {/* Atmosphere Simulation Panel */}
+      <div className="atmosphere-panel">
+        <h3>Atmosphere Simulation</h3>
+        
+        <div className="atmosphere-item">
+          <span>Wind Effect</span>
+          <button
+            onClick={() => {
+              const newState = !showWind;
+              setShowWind(newState);
+              // Play/pause wind audio
+              const audio = document.getElementById('wind-audio') as HTMLAudioElement;
+              if (audio) {
+                if (newState) {
+                  audio.volume = Math.min(windSpeed / 20, 1);
+                  audio.play();
+                } else {
+                  audio.pause();
+                }
+              }
+            }}
+            className={`atmosphere-toggle ${showWind ? 'active' : ''}`}
+          />
+        </div>
+
+        {showWind && (
+          <div className="atmosphere-slider">
+            <label>
+              <span>Speed</span>
+              <span>{windSpeed.toFixed(0)} m/s</span>
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="20"
+              step="1"
+              value={windSpeed}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                setWindSpeed(val);
+                const audio = document.getElementById('wind-audio') as HTMLAudioElement;
+                if (audio) audio.volume = Math.min(val / 20, 1);
+              }}
+            />
+            <label>
+              <span>Direction</span>
+              <span>{windDirection}°</span>
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              step="15"
+              value={windDirection}
+              onChange={(e) => setWindDirection(parseFloat(e.target.value))}
+            />
+          </div>
+        )}
+
+        <div className="atmosphere-item">
+          <span>Pollution Haze</span>
+          <button
+            onClick={() => setShowPollution(!showPollution)}
+            className={`atmosphere-toggle ${showPollution ? 'active-orange' : ''}`}
+          />
+        </div>
+      </div>
+
+      {/* Wind Audio Element */}
+      <audio id="wind-audio" loop preload="auto">
+        <source src="/audio/wind.mp3" type="audio/mpeg" />
+      </audio>
 
       {/* Station Popup */}
       {popup.visible && popup.station && (
