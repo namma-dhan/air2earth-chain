@@ -34,9 +34,9 @@ export const TOOLS: Record<ToolType, ToolConfig> = {
     purifier: {
         id: 'purifier',
         name: 'Air Purifiers',
-        subtitle: 'Clean air units',
-        modelUrl: '/assets/purifier.glb',
-        scale: 1.5,
+        subtitle: 'Place on surface',
+        modelUrl: '/assets/aqi/air.glb',
+        scale: 0.5,
         heightOffset: 0,
     }
 };
