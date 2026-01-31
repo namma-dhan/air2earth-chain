@@ -1,9 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import 'normalize.css';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import * as Cesium from 'cesium';
 import './AqiCesium.css';
 import { Toolbox } from './components/shared/Toolbox';
+import { ImpactPopup } from './components/ImpactPopup';
+import { TotalImpactPanel } from './components/TotalImpactPanel';
+import { 
+  estimateTreeImpact, 
+  estimateGardenImpact, 
+  estimatePurifierImpact, 
+  calculateTotalImpact,
+  type ImpactData 
+} from './utils/calculations';
 
 const ACCESS_TOKEN = import.meta.env.VITE_CESIUM_ACCESS_TOKEN;
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
@@ -204,6 +213,59 @@ function AqiCesiumApp() {
 
   const [popup, setPopup] = useState<PopupInfo>({ visible: false, x: 0, y: 0, station: null });
   const [viewer, setViewer] = useState<Cesium.Viewer | null>(null);
+  
+  // Impact popup state
+  const [currentImpact, setCurrentImpact] = useState<ImpactData | null>(null);
+  const [impactPosition, setImpactPosition] = useState<{ x: number; y: number } | null>(null);
+  const [allImpacts, setAllImpacts] = useState<ImpactData[]>([]);
+
+  // Handle placement completed events from PlacementManager
+  const handlePlacementCompleted = useCallback((event: CustomEvent<{ 
+    tool: string; 
+    screenPosition: { x: number; y: number } | null;
+    areaM2?: number;
+  }>) => {
+    const { tool, screenPosition, areaM2 } = event.detail;
+    
+    let impact: ImpactData | null = null;
+    
+    if (tool === 'tree') {
+      impact = estimateTreeImpact();
+    } else if (tool === 'garden') {
+      impact = estimateGardenImpact(areaM2 || 15);
+    } else if (tool === 'purifier') {
+      impact = estimatePurifierImpact();
+    }
+    
+    if (impact) {
+      setCurrentImpact(impact);
+      setImpactPosition(screenPosition);
+      setAllImpacts(prev => [...prev, impact!]);
+      
+      // Auto-hide popup after 5 seconds
+      setTimeout(() => {
+        setCurrentImpact(null);
+        setImpactPosition(null);
+      }, 5000);
+    }
+  }, []);
+
+  // Listen for placement events
+  useEffect(() => {
+    window.addEventListener('placement-completed', handlePlacementCompleted as EventListener);
+    return () => {
+      window.removeEventListener('placement-completed', handlePlacementCompleted as EventListener);
+    };
+  }, [handlePlacementCompleted]);
+
+  const closeImpactPopup = useCallback(() => {
+    setCurrentImpact(null);
+    setImpactPosition(null);
+  }, []);
+
+  const handleGetQuote = useCallback(() => {
+    alert('Quote request submitted! Our team will contact you shortly.');
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -591,6 +653,19 @@ function AqiCesiumApp() {
           </div>
         </div>
       )}
+
+      {/* Impact Popup for placements */}
+      <ImpactPopup 
+        impact={currentImpact} 
+        position={impactPosition} 
+        onClose={closeImpactPopup} 
+      />
+
+      {/* Total Impact Panel */}
+      <TotalImpactPanel 
+        summary={calculateTotalImpact(allImpacts)} 
+        onGetQuote={handleGetQuote} 
+      />
     </div>
   );
 }

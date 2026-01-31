@@ -27,6 +27,16 @@ const SolarPage: React.FC = () => {
   const [peakSunHours, setPeakSunHours] = useState(5.5);
   const [showShadows, setShowShadows] = useState(true);
 
+  // Refs to hold current parameter values for use inside event handlers without causing re-renders
+  const shadowCoverageRef = useRef(shadowCoverage);
+  const tariffRef = useRef(tariff);
+  const peakSunHoursRef = useRef(peakSunHours);
+
+  // Sync refs when state changes
+  useEffect(() => { shadowCoverageRef.current = shadowCoverage; }, [shadowCoverage]);
+  useEffect(() => { tariffRef.current = tariff; }, [tariff]);
+  useEffect(() => { peakSunHoursRef.current = peakSunHours; }, [peakSunHours]);
+
   // Sync shadow settings with viewer
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -139,9 +149,9 @@ const SolarPage: React.FC = () => {
             const dimensions: BuildingDimensions = estimateBuildingDimensions(height, levels, elementId ? String(elementId) : undefined);
             const solarData = calculateSolarPotential(
               dimensions,
-              shadowCoverage, // Using current state
-              tariff,
-              peakSunHours
+              shadowCoverageRef.current, // Using ref for current value
+              tariffRef.current,
+              peakSunHoursRef.current
             );
 
             // Create Billboard
@@ -179,7 +189,7 @@ const SolarPage: React.FC = () => {
       handler.destroy();
       viewer.destroy();
     };
-  }, [highlightBuilding, shadowCoverage, tariff, peakSunHours]);
+  }, [highlightBuilding]);
 
   return (
     <div className="relative w-full h-full min-h-screen">
@@ -269,6 +279,52 @@ const SolarPage: React.FC = () => {
       {/* Footer Info */}
       <div className="absolute bottom-5 right-5 z-10 px-4 py-2 bg-black/40 backdrop-blur-sm rounded text-[10px] text-white/60">
         Ahmedabad, Gujarat Visualization • Data powered by OSM & Cesium
+      </div>
+
+      {/* Solar Summary Panel - Your Solar Plan */}
+      <div className="absolute bottom-30 left-5 z-10 w-72 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl text-white overflow-hidden">
+        <div className="p-4 border-b border-white/10">
+          <h3 className="text-sm font-semibold flex items-center gap-2">
+            ☀️ Your Solar Plan
+          </h3>
+        </div>
+        <div className="p-4 space-y-3">
+          {/* Metrics */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+              <span className="text-xs text-white/60">Shadow Loss</span>
+              <span className="text-sm font-semibold text-yellow-400">{(shadowCoverage * 100).toFixed(0)}%</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+              <span className="text-xs text-white/60">Electricity Tariff</span>
+              <span className="text-sm font-semibold text-green-400">₹{tariff.toFixed(1)}/unit</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+              <span className="text-xs text-white/60">Peak Sun Hours</span>
+              <span className="text-sm font-semibold text-orange-400">{peakSunHours.toFixed(1)} hrs</span>
+            </div>
+          </div>
+
+          {/* Estimated Savings */}
+          <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">💰</span>
+              <span className="text-xs text-white/60">Est. Monthly Savings</span>
+            </div>
+            <p className="text-xl font-bold text-yellow-400">
+              ₹{Math.round((1 - shadowCoverage) * tariff * peakSunHours * 30 * 4).toLocaleString('en-IN')}
+            </p>
+            <p className="text-[10px] text-white/40 mt-1">Based on avg 4kW rooftop system</p>
+          </div>
+
+          {/* Get Quote Button */}
+          <button 
+            onClick={() => alert(`Quote Request:\n- Shadow Loss: ${(shadowCoverage * 100).toFixed(0)}%\n- Tariff: ₹${tariff}/unit\n- Peak Sun: ${peakSunHours} hrs\n\nOur team will contact you shortly!`)}
+            className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-yellow-500/20"
+          >
+            Get Quote 
+          </button>
+        </div>
       </div>
     </div>
   );
