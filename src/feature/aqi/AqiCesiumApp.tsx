@@ -6,6 +6,7 @@ import './AqiCesium.css';
 import { Toolbox } from './components/shared/Toolbox';
 import { ImpactPopup } from './components/ImpactPopup';
 import { TotalImpactPanel } from './components/TotalImpactPanel';
+import { VRScene, VRButton } from '../../components/vr';
 import { 
   estimateTreeImpact, 
   estimateGardenImpact, 
@@ -224,6 +225,7 @@ function AqiCesiumApp() {
   const [windSpeed, setWindSpeed] = useState(8.0); // m/s
   const [windDirection, setWindDirection] = useState(45); // degrees
   const [showPollution, setShowPollution] = useState(true);
+  const [isVRMode, setIsVRMode] = useState(false);
   
   // Refs for shader access
   const showWindRef = useRef(showWind);
@@ -887,6 +889,21 @@ function AqiCesiumApp() {
         summary={calculateTotalImpact(allImpacts)} 
         onGetQuote={handleGetQuote} 
       />
+
+      {/* VR Mode Button */}
+      <div className="absolute bottom-5 right-5 z-10">
+        <VRButton 
+          onEnterVR={() => setIsVRMode(true)}
+        />
+      </div>
+
+      {/* VR Scene Overlay */}
+      {isVRMode && (
+        <VRScene 
+          cesiumCanvas={containerRef.current?.querySelector('canvas') as HTMLCanvasElement}
+          onExitVR={() => setIsVRMode(false)}
+        />
+      )}
     </div>
   );
 }
