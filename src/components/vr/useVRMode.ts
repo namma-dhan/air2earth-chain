@@ -33,7 +33,8 @@ export function useVRMode(): VRModeState {
     try {
       const xr = (navigator as Navigator & { xr: XRSystem }).xr;
       const session = await xr.requestSession('immersive-vr', {
-        optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers']
+        // Only request minimal features for Quest compatibility
+        optionalFeatures: ['local-floor']
       });
       
       sessionRef.current = session;
