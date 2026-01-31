@@ -1,55 +1,277 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as Cesium from 'cesium';
+import { debounce } from 'lodash';
+import {
+  estimateBuildingDimensions,
+  calculateSolarPotential,
+  createSolarIndicator,
+  type BuildingDimensions
+} from './utils/calculations';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 
-const SolarPage = () => {
+// Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
+(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
+
+const CESIUM_ACCESS_TOKEN = (import.meta as any).env?.VITE_CESIUM_ACCESS_TOKEN || '';
+Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
+
+const SolarPage: React.FC = () => {
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<Cesium.Viewer | null>(null);
+  const highlightedFeatureRef = useRef<any>(null);
+  const hoveredEntityRef = useRef<Cesium.Entity | null>(null);
+
+  // UI State
+  const [shadowCoverage, setShadowCoverage] = useState(0.25);
+  const [tariff, setTariff] = useState(8.0);
+  const [peakSunHours, setPeakSunHours] = useState(5.5);
+  const [showShadows, setShowShadows] = useState(true);
+
+  // Sync shadow settings with viewer
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || viewer.isDestroyed()) return;
+
+    if (viewer.scene.shadowMap) {
+      viewer.scene.shadowMap.enabled = showShadows;
+    }
+
+    // Adjust atmosphere to a sunny state
+    if (viewer.scene.skyAtmosphere) {
+      viewer.scene.skyAtmosphere.brightnessShift = 0.1;
+      viewer.scene.skyAtmosphere.saturationShift = 0.2;
+    }
+  }, [showShadows]);
+
+  const highlightBuilding = useCallback((feature: any, monthlySavings: number) => {
+    if (highlightedFeatureRef.current) {
+      highlightedFeatureRef.current.color = Cesium.Color.WHITE;
+    }
+
+    // High yield = Golden, Medium = Amber, Low = Yellow
+    let color = Cesium.Color.YELLOW.withAlpha(0.8);
+    if (monthlySavings > 25000) color = Cesium.Color.GOLD.withAlpha(0.9);
+    else if (monthlySavings > 10000) color = Cesium.Color.ORANGE.withAlpha(0.85);
+
+    feature.color = color;
+    highlightedFeatureRef.current = feature;
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const viewer = new Cesium.Viewer(containerRef.current, {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      vrButton: true,
+      animation: true,
+      timeline: true,
+      navigationHelpButton: false,
+      sceneModePicker: false,
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      // @ts-ignore
+      shouldAnimate: true
+    });
+
+    viewerRef.current = viewer;
+    if (viewer.scene.skyAtmosphere) {
+      viewer.scene.skyAtmosphere.show = true;
+    }
+
+    // View Ahmedabad context
+    const latitude = 23.0225;
+    const longitude = 72.5714;
+    const altitude = 1000;
+    const position = Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude);
+    viewer.scene.camera.setView({
+      destination: position,
+      orientation: {
+        heading: Cesium.Math.toRadians(0),
+        pitch: Cesium.Math.toRadians(-35.0),
+        roll: 0.0,
+      },
+    });
+
+    // Initialize OSM Buildings
+    Cesium.createOsmBuildingsAsync().then((tileset) => {
+      viewer.scene.primitives.add(tileset);
+      tileset.shadows = Cesium.ShadowMode.ENABLED;
+    });
+
+    if (viewer.scene.shadowMap) {
+      viewer.scene.shadowMap.enabled = true;
+      viewer.scene.shadowMap.size = 4096; // High quality for solar analysis
+      viewer.scene.shadowMap.softShadows = true;
+    }
+
+    // Set dynamic sun light
+    viewer.scene.light = new Cesium.SunLight();
+
+    // Set time to noon for peak solar
+    const fixedTime = new Date();
+    fixedTime.setUTCHours(7, 0, 0, 0); // ~12:30 PM IST
+    viewer.clock.currentTime = Cesium.JulianDate.fromDate(fixedTime);
+    viewer.clock.multiplier = 3600; // Fast time progression
+    viewer.clock.shouldAnimate = false;
+
+    // Mouse Move Handler
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    const debouncedMouseMove = debounce((movement) => {
+      const scene = viewer.scene;
+      const pickedObject = scene.pick(movement.endPosition);
+
+      if (Cesium.defined(pickedObject) && pickedObject.primitive instanceof Cesium.Cesium3DTileset) {
+        const cartesian = scene.pickPosition(movement.endPosition);
+        if (Cesium.defined(cartesian)) {
+          // Clear previous hover entity
+          if (hoveredEntityRef.current) {
+            viewer.entities.remove(hoveredEntityRef.current);
+          }
+
+          // Check if it's a feature we can analyze
+          if (pickedObject instanceof Cesium.Cesium3DTileFeature) {
+            const height = pickedObject.getProperty("cesium#estimatedHeight") || 15;
+            const levels = pickedObject.getProperty("building:levels") || Math.max(1, Math.floor(height / 3.5));
+            const elementId = pickedObject.getProperty("elementId");
+
+            // Recalculate based on current UI parameters using elementId as a seed for consistent variation
+            const dimensions: BuildingDimensions = estimateBuildingDimensions(height, levels, elementId ? String(elementId) : undefined);
+            const solarData = calculateSolarPotential(
+              dimensions,
+              shadowCoverage, // Using current state
+              tariff,
+              peakSunHours
+            );
+
+            // Create Billboard
+            const tooltipPosition = Cesium.Cartesian3.clone(cartesian);
+            Cesium.Cartesian3.add(tooltipPosition, new Cesium.Cartesian3(0, 0, 15), tooltipPosition);
+
+            hoveredEntityRef.current = viewer.entities.add({
+              position: tooltipPosition,
+              billboard: {
+                image: createSolarIndicator(solarData),
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                scale: 0.6,
+                disableDepthTestDistance: Number.POSITIVE_INFINITY,
+              },
+            });
+
+            highlightBuilding(pickedObject, solarData.savingsMonthInr);
+          }
+        }
+      } else {
+        if (hoveredEntityRef.current) {
+          viewer.entities.remove(hoveredEntityRef.current);
+          hoveredEntityRef.current = null;
+        }
+        if (highlightedFeatureRef.current) {
+          highlightedFeatureRef.current.color = Cesium.Color.WHITE;
+          highlightedFeatureRef.current = null;
+        }
+      }
+    }, 50);
+
+    handler.setInputAction(debouncedMouseMove, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+    return () => {
+      handler.destroy();
+      viewer.destroy();
+    };
+  }, [highlightBuilding, shadowCoverage, tariff, peakSunHours]);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-green-100 py-4">
-        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between">
-          <button
-            onClick={() => navigate('/')}
-            className="text-green-600 hover:text-green-700 font-medium"
-          >
-            ← Back
-          </button>
-          <h1 className="text-xl font-bold text-green-700">Aero-Earth Nexus</h1>
-          <div className="w-16"></div>
-        </div>
-      </header>
+    <div className="relative w-full h-full min-h-screen">
+      <div ref={containerRef} className="absolute inset-0 w-full h-full bg-slate-900" />
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-green-700 mb-4">Solar Potential</h2>
-          <p className="text-green-600">Urban solar energy intelligence and optimization</p>
-        </div>
+      {/* Control Panel */}
+      <div className="absolute top-5 left-5 z-10 w-80 p-6 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl text-white">
 
-        {/* Content Box */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
-          <p className="text-green-700 text-lg mb-4">☀️ Solar Analytics</p>
-          <p className="text-green-600">
-            Analyze solar irradiance, rooftop potential, and energy forecasts.
-          </p>
-        </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-green-700">8.4</p>
-            <p className="text-green-600 text-sm">kWh/m²/day</p>
+        <div className="space-y-6">
+          {/* Shadow Toggle */}
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+            <span className="text-sm font-medium">Show Shadows</span>
+            <button
+              onClick={() => setShowShadows(!showShadows)}
+              className={`w-12 h-6 rounded-full transition-colors relative ${showShadows ? 'bg-yellow-500' : 'bg-slate-700'}`}
+            >
+              <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${showShadows ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-green-700">1,247</p>
-            <p className="text-green-600 text-sm">MWh Monthly</p>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Shadow Loss: {(shadowCoverage * 100).toFixed(0)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="0.8"
+                step="0.05"
+                value={shadowCoverage}
+                onChange={(e) => setShadowCoverage(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Tariff: ₹{tariff.toFixed(1)}/unit
+              </label>
+              <input
+                type="range"
+                min="4"
+                max="12"
+                step="0.5"
+                value={tariff}
+                onChange={(e) => setTariff(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Peak Sun: {peakSunHours.toFixed(1)} hrs
+              </label>
+              <input
+                type="range"
+                min="3"
+                max="8"
+                step="0.1"
+                value={peakSunHours}
+                onChange={(e) => setPeakSunHours(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              />
+            </div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-green-700">68%</p>
-            <p className="text-green-600 text-sm">Rooftop Coverage</p>
+
+          <div className="pt-4 border-t border-white/5">
+
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Stats Overlay Bottom */}
+      <div className="absolute top-5 right-5 z-10 flex gap-4">
+        <div className="px-4 py-2 bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/10 text-center">
+          <p className="text-[10px] uppercase tracking-tighter text-white/40">Avg. Irradiation</p>
+          <p className="text-lg font-bold text-yellow-400">5.8 <span className="text-[10px] text-white/60">kWh/m²</span></p>
+        </div>
+        <div className="px-4 py-2 bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/10 text-center">
+          <p className="text-[10px] uppercase tracking-tighter text-white/40">Market Tariff</p>
+          <p className="text-lg font-bold text-green-400">₹8.5 <span className="text-[10px] text-white/60">avg</span></p>
+        </div>
+      </div>
+
+      {/* Footer Info */}
+      <div className="absolute bottom-5 right-5 z-10 px-4 py-2 bg-black/40 backdrop-blur-sm rounded text-[10px] text-white/60">
+        Ahmedabad, Gujarat Visualization • Data powered by OSM & Cesium
+      </div>
     </div>
   );
 };
