@@ -9,6 +9,7 @@ import {
   type RainParams
 } from './utils/calculations';
 import { setupCesiumVR } from '../../utils/CesiumVR';
+import { VRScene, VRButton } from '../../components/vr';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
@@ -29,6 +30,7 @@ const WaterPage: React.FC = () => {
 
   // UI State
   const [isRaining, setIsRaining] = useState(false);
+  const [isVRMode, setIsVRMode] = useState(false);
 
   // Adjustable rain parameters
   const [rainIntensity, setRainIntensity] = useState(1.0);
@@ -468,8 +470,22 @@ const WaterPage: React.FC = () => {
           >
             ✅ Get Quote / Buy Now
           </button>
+
+          {/* VR Mode Button */}
+          <VRButton 
+            className="w-full mt-3" 
+            onEnterVR={() => setIsVRMode(true)}
+          />
         </div>
       </div>
+
+      {/* VR Scene Overlay */}
+      {isVRMode && (
+        <VRScene 
+          cesiumCanvas={containerRef.current?.querySelector('canvas') as HTMLCanvasElement}
+          onExitVR={() => setIsVRMode(false)}
+        />
+      )}
 
       {/* Rain Audio Element */}
       <audio id="rain-audio" loop preload="auto">

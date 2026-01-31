@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/fiber": "^9.5.0",
+    "@react-three/xr": "^6.6.29",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/lodash": "^4.17.23",
     "@types/three": "^0.182.0",

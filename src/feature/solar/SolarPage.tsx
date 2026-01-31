@@ -7,6 +7,7 @@ import {
   createSolarIndicator,
   type BuildingDimensions
 } from './utils/calculations';
+import { VRScene, VRButton } from '../../components/vr';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
@@ -26,6 +27,7 @@ const SolarPage: React.FC = () => {
   const [tariff, setTariff] = useState(8.0);
   const [peakSunHours, setPeakSunHours] = useState(5.5);
   const [showShadows, setShowShadows] = useState(true);
+  const [isVRMode, setIsVRMode] = useState(false);
 
   // Refs to hold current parameter values for use inside event handlers without causing re-renders
   const shadowCoverageRef = useRef(shadowCoverage);
@@ -324,8 +326,22 @@ const SolarPage: React.FC = () => {
           >
             Get Quote 
           </button>
+
+          {/* VR Mode Button */}
+          <VRButton 
+            className="w-full mt-3" 
+            onEnterVR={() => setIsVRMode(true)}
+          />
         </div>
       </div>
+
+      {/* VR Scene Overlay */}
+      {isVRMode && (
+        <VRScene 
+          cesiumCanvas={containerRef.current?.querySelector('canvas') as HTMLCanvasElement}
+          onExitVR={() => setIsVRMode(false)}
+        />
+      )}
     </div>
   );
 };
