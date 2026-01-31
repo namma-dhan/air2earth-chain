@@ -341,6 +341,16 @@ export class PlacementManager {
             : Cesium.Math.toRadians(0);
 
         await this.createPlacement(position, effectiveHeading);
+        
+        // Dispatch placement completed event for UI to show popup
+        const canvasPos = Cesium.SceneTransforms.worldToWindowCoordinates(this.viewer.scene, position);
+        window.dispatchEvent(new CustomEvent('placement-completed', {
+            detail: {
+                tool: this.activeTool,
+                position: position,
+                screenPosition: canvasPos ? { x: canvasPos.x, y: canvasPos.y } : null
+            }
+        }));
     }
 
     private paintBuildingFeature(position: Cesium.Cartesian3) {
@@ -395,6 +405,17 @@ export class PlacementManager {
                     }
                 });
             }
+            
+            // Dispatch placement completed event for garden painting
+            const canvasPos = Cesium.SceneTransforms.worldToWindowCoordinates(this.viewer.scene, position);
+            window.dispatchEvent(new CustomEvent('placement-completed', {
+                detail: {
+                    tool: 'garden',
+                    position: position,
+                    screenPosition: canvasPos ? { x: canvasPos.x, y: canvasPos.y } : null,
+                    areaM2: 10 + Math.floor(Math.random() * 20) // Estimate 10-30 m² per click
+                }
+            }));
 
         } else {
             console.warn('No building feature found to paint at this location.');

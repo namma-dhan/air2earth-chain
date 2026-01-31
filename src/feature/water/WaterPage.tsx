@@ -385,6 +385,65 @@ const WaterPage: React.FC = () => {
       <div className="absolute bottom-5 right-5 z-10 px-4 py-2 bg-black/40 backdrop-blur-sm rounded text-[10px] text-white/60">
         Ahmedabad, Gujarat Visualization • Data powered by OSM & Cesium
       </div>
+
+      {/* Rain Summary Panel - Your Rainwater Plan */}
+      <div className="absolute bottom-24 left-5 z-10 w-72 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl text-white overflow-hidden">
+        <div className="p-4 border-b border-white/10">
+          <h3 className="text-sm font-semibold flex items-center gap-2">
+            🌧️ Your Rainwater Plan
+          </h3>
+        </div>
+        <div className="p-4 space-y-3">
+          {/* Status */}
+          <div className="flex items-center gap-2 p-2 bg-white/5 rounded-lg">
+            <span className={`w-2 h-2 rounded-full ${isRaining ? 'bg-blue-400 animate-pulse' : 'bg-gray-500'}`}></span>
+            <span className="text-xs text-white/60">Status</span>
+            <span className={`ml-auto text-sm font-semibold ${isRaining ? 'text-blue-400' : 'text-gray-400'}`}>
+              {isRaining ? 'Raining' : 'Clear'}
+            </span>
+          </div>
+
+          {/* Metrics */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+              <span className="text-xs text-white/60">Rain Intensity</span>
+              <span className="text-sm font-semibold text-blue-400">{rainIntensity.toFixed(1)}x</span>
+            </div>
+            <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+              <span className="text-xs text-white/60">Collection Angle</span>
+              <span className="text-sm font-semibold text-cyan-400">{Math.abs(rainAngle * 60).toFixed(0)}°</span>
+            </div>
+          </div>
+
+          {/* Estimated Collection */}
+          <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">💧</span>
+              <span className="text-xs text-white/60">Est. Daily Collection</span>
+            </div>
+            <p className="text-xl font-bold text-blue-400">
+              {Math.round(rainIntensity * 2500 * (isRaining ? 1 : 0.3)).toLocaleString('en-IN')} L
+            </p>
+            <p className="text-[10px] text-white/40 mt-1">Based on avg 100m² rooftop</p>
+          </div>
+
+          {/* Tank Capacity Estimate */}
+          <div className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+            <span className="text-xs text-white/60">Recommended Tank</span>
+            <span className="text-sm font-semibold text-emerald-400">
+              {Math.ceil(rainIntensity * 2500 / 1000) * 2}K L
+            </span>
+          </div>
+
+          {/* Get Quote Button */}
+          <button 
+            onClick={() => alert(`Quote Request:\n- Rain Intensity: ${rainIntensity.toFixed(1)}x\n- Angle: ${rainAngle.toFixed(2)}\n- Est. Collection: ${Math.round(rainIntensity * 2500)} L/day\n\nOur team will contact you shortly!`)}
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/20"
+          >
+            ✅ Get Quote / Buy Now
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
