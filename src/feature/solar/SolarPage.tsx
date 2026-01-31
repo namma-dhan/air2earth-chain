@@ -7,7 +7,7 @@ import {
   createSolarIndicator,
   type BuildingDimensions
 } from './utils/calculations';
-import { VRScene, VRButton } from '../../components/vr';
+import { ImmersiveVRScene, VRButton } from '../../components/vr';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
@@ -336,9 +336,9 @@ const SolarPage: React.FC = () => {
       </div>
 
       {/* VR Scene Overlay */}
-      {isVRMode && (
-        <VRScene 
-          cesiumCanvas={containerRef.current?.querySelector('canvas') as HTMLCanvasElement}
+      {isVRMode && viewerRef.current && (
+        <ImmersiveVRScene 
+          viewer={viewerRef.current}
           onExitVR={() => setIsVRMode(false)}
         />
       )}
