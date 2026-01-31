@@ -6,7 +6,7 @@ import './AqiCesium.css';
 import { Toolbox } from './components/shared/Toolbox';
 import { ImpactPopup } from './components/ImpactPopup';
 import { TotalImpactPanel } from './components/TotalImpactPanel';
-import { VRScene, VRButton } from '../../components/vr';
+import { ImmersiveVRScene, VRButton } from '../../components/vr';
 import { 
   estimateTreeImpact, 
   estimateGardenImpact, 
@@ -898,9 +898,9 @@ function AqiCesiumApp() {
       </div>
 
       {/* VR Scene Overlay */}
-      {isVRMode && (
-        <VRScene 
-          cesiumCanvas={containerRef.current?.querySelector('canvas') as HTMLCanvasElement}
+      {isVRMode && viewer && (
+        <ImmersiveVRScene 
+          viewer={viewer}
           onExitVR={() => setIsVRMode(false)}
         />
       )}
