@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as Cesium from 'cesium';
 import { debounce } from 'lodash';
 import {
@@ -17,7 +16,6 @@ const CESIUM_ACCESS_TOKEN = (import.meta as any).env?.VITE_CESIUM_ACCESS_TOKEN |
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 const SolarPage: React.FC = () => {
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const highlightedFeatureRef = useRef<any>(null);
