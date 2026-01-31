@@ -308,93 +308,101 @@ const WaterPage: React.FC = () => {
     <div className="relative w-full h-full min-h-screen">
       <div ref={containerRef} className="absolute inset-0 w-full h-full bg-slate-900" />
 
-      {/* Rain Controls */}
-      <div className="absolute top-5 left-5 z-10 flex flex-col gap-3">
-        {/* Start/Stop Rain Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setIsRaining(true)}
-            disabled={isRaining}
-            className={`py-2 px-4 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${isRaining
-              ? 'bg-gray-500 cursor-not-allowed opacity-50'
-              : 'bg-gradient-to-r from-blue-400 to-blue-600 text-white hover:-translate-y-1 active:scale-95'
-              }`}
-          >
-            🌧️ Start Rain
-          </button>
-          <button
-            onClick={() => setIsRaining(false)}
-            disabled={!isRaining}
-            className={`py-2 px-4 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${!isRaining
-              ? 'bg-gray-500 cursor-not-allowed opacity-50'
-              : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 hover:-translate-y-1 active:scale-95'
-              }`}
-          >
-            ☀️ Stop Rain
-          </button>
-        </div>
+      {/* Control Panel - matches Solar Page styling */}
+      <div className="absolute top-5 left-5 z-10 w-80 p-6 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl text-white">
 
-        {/* Rain Parameter Sliders */}
-        <div className="p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl text-white space-y-3">
-          <div>
-            <label className="text-xs text-white/80 flex justify-between">
-              <span>Intensity</span>
-              <span>{rainIntensity.toFixed(2)}</span>
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="2.0"
-              step="0.1"
-              value={rainIntensity}
-              onChange={(e) => setRainIntensity(parseFloat(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
+        <div className="space-y-6">
+          {/* Rain Toggle */}
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+            <span className="text-sm font-medium">Rain Simulation</span>
+            <button
+              onClick={() => {
+                const newState = !isRaining;
+                setIsRaining(newState);
+                const audio = document.getElementById('rain-audio') as HTMLAudioElement;
+                if (audio) {
+                  if (newState) {
+                    audio.volume = Math.min(rainIntensity / 2, 1);
+                    audio.play().catch(() => {});
+                  } else {
+                    audio.pause();
+                  }
+                }
+              }}
+              className={`w-12 h-6 rounded-full transition-colors relative ${isRaining ? 'bg-blue-500' : 'bg-slate-700'}`}
+            >
+              <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isRaining ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
           </div>
-          <div>
-            <label className="text-xs text-white/80 flex justify-between">
-              <span>Angle</span>
-              <span>{rainAngle.toFixed(2)}</span>
-            </label>
-            <input
-              type="range"
-              min="-1.5"
-              max="1.5"
-              step="0.1"
-              value={rainAngle}
-              onChange={(e) => setRainAngle(parseFloat(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Intensity: {rainIntensity.toFixed(1)}x
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="2.0"
+                step="0.1"
+                value={rainIntensity}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setRainIntensity(val);
+                  const audio = document.getElementById('rain-audio') as HTMLAudioElement;
+                  if (audio && isRaining) audio.volume = Math.min(val / 2, 1);
+                }}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Angle: {(rainAngle * 60).toFixed(0)}°
+              </label>
+              <input
+                type="range"
+                min="-1.5"
+                max="1.5"
+                step="0.1"
+                value={rainAngle}
+                onChange={(e) => setRainAngle(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Drop Size: {rainSize.toFixed(1)}
+              </label>
+              <input
+                type="range"
+                min="0.1"
+                max="2.0"
+                step="0.1"
+                value={rainSize}
+                onChange={(e) => setRainSize(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-widest text-white/60 flex justify-between">
+                Speed: {rainSpeed.toFixed(0)}
+              </label>
+              <input
+                type="range"
+                min="10"
+                max="120"
+                step="5"
+                value={rainSpeed}
+                onChange={(e) => setRainSpeed(parseFloat(e.target.value))}
+                className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-400"
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-xs text-white/80 flex justify-between">
-              <span>Size</span>
-              <span>{rainSize.toFixed(2)}</span>
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="2.0"
-              step="0.1"
-              value={rainSize}
-              onChange={(e) => setRainSize(parseFloat(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-white/80 flex justify-between">
-              <span>Speed</span>
-              <span>{rainSpeed.toFixed(0)}</span>
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="120"
-              step="5"
-              value={rainSpeed}
-              onChange={(e) => setRainSpeed(parseFloat(e.target.value))}
-              className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
+
+          <div className="pt-4 border-t border-white/5">
           </div>
         </div>
       </div>
@@ -462,6 +470,11 @@ const WaterPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Rain Audio Element */}
+      <audio id="rain-audio" loop preload="auto">
+        <source src="/audio/rain.mp3" type="audio/mpeg" />
+      </audio>
     </div>
   );
 };
