@@ -19,6 +19,7 @@ const LandingPage = () => {
   ];
 
   const [activeCard, setActiveCard] = useState(0);
+  const [activeAqiOption, setActiveAqiOption] = useState('tree');
 
   const competitors = [
     {
@@ -159,8 +160,39 @@ const LandingPage = () => {
     setIsPopupOpen(false);
     setTimeout(() => navigate(route), 200);
   };
-
   const titleText = 'AEROEARTH';
+
+  // Helper component for stats rows
+  const StatRow = ({ label, value, valueColor = 'rgba(255, 255, 255, 0.9)' }: { label: string; value: string; valueColor?: string }) => (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.5rem 0',
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.9rem',
+          color: 'rgba(255, 255, 255, 0.5)',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: '0.95rem',
+          fontWeight: 500,
+          color: valueColor,
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
 
   return (
     <>
@@ -785,6 +817,497 @@ const LandingPage = () => {
               </AnimatePresence>
             </div>
           </div>
+        </motion.div>
+      </div>
+
+      {/* Features Section */}
+      <div
+        style={{
+          width: '100%',
+          backgroundColor: '#000000',
+          padding: '6rem 2rem',
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8 }}
+          style={{
+            width: '100%',
+            maxWidth: '1400px',
+            margin: '0 auto',
+          }}
+        >
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <span style={{ width: '30px', height: '2px', backgroundColor: '#00ff55' }} />
+              <span
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '0.75rem',
+                  color: '#00ff55',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Environmental Solutions
+              </span>
+              <span style={{ width: '30px', height: '2px', backgroundColor: '#00ff55' }} />
+            </div>
+            <h2
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                fontWeight: 700,
+                color: '#ffffff',
+                margin: '0 0 1rem 0',
+              }}
+            >
+              Explore Our <span style={{ color: '#00ff55' }}>Features</span>
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: '1.1rem',
+                color: 'rgba(255, 255, 255, 0.5)',
+                maxWidth: '600px',
+                margin: '0 auto',
+              }}
+            >
+              Comprehensive environmental intelligence tools for sustainable living
+            </p>
+          </div>
+
+          {/* ===== AQI FEATURE ===== */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '4rem' }}
+          >
+            {/* AQI Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '2rem' }}>🌿</span>
+              <h3
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: '1.75rem',
+                  fontWeight: 600,
+                  color: '#00ff55',
+                  margin: 0,
+                }}
+              >
+                Air Quality Solutions
+              </h3>
+            </div>
+
+            {/* AQI Sub-options */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {[
+                { id: 'tree', label: 'Tree Planting', icon: '🌳' },
+                { id: 'garden', label: 'Vertical Garden', icon: '🌿' },
+                { id: 'purifier', label: 'Air Purifiers', icon: '💨' },
+              ].map((option) => (
+                <motion.button
+                  key={option.id}
+                  onClick={() => setActiveAqiOption(option.id)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '20px',
+                    border: activeAqiOption === option.id ? '1px solid #00ff55' : '1px solid rgba(255, 255, 255, 0.1)',
+                    background: activeAqiOption === option.id ? 'rgba(0, 255, 85, 0.15)' : 'transparent',
+                    color: activeAqiOption === option.id ? '#00ff55' : 'rgba(255, 255, 255, 0.5)',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <span>{option.icon}</span>
+                  {option.label}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* AQI Content Card */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '2rem',
+                background: 'linear-gradient(135deg, rgba(20, 25, 20, 0.9) 0%, rgba(10, 15, 10, 0.95) 100%)',
+                borderRadius: '24px',
+                border: '1px solid rgba(0, 255, 85, 0.2)',
+                overflow: 'hidden',
+                minHeight: '400px',
+              }}
+            >
+              {/* Left - Image Area */}
+              <div
+                style={{
+                  padding: '2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'radial-gradient(circle at center, rgba(0, 255, 85, 0.05) 0%, transparent 70%)',
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeAqiOption}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    {activeAqiOption === 'tree' && (
+                      <>
+                        <div style={{ fontSize: '6rem', marginBottom: '1rem' }}>🌳</div>
+                        <h4 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.5rem', color: '#00ff55', margin: 0 }}>Mango Tree</h4>
+                        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', margin: '0.5rem 0 0' }}>Best for streets + open areas</p>
+                      </>
+                    )}
+                    {activeAqiOption === 'garden' && (
+                      <>
+                        <div style={{ fontSize: '6rem', marginBottom: '1rem' }}>🌿</div>
+                        <h4 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.5rem', color: '#00ff55', margin: 0 }}>Vertical Garden</h4>
+                        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', margin: '0.5rem 0 0' }}>Urban wall installation</p>
+                      </>
+                    )}
+                    {activeAqiOption === 'purifier' && (
+                      <>
+                        <div style={{ fontSize: '6rem', marginBottom: '1rem' }}>💨</div>
+                        <h4 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.5rem', color: '#00ff55', margin: 0 }}>Air Purifier</h4>
+                        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', margin: '0.5rem 0 0' }}>Indoor air quality solution</p>
+                      </>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Right - Stats Panel */}
+              <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column' }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeAqiOption}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                      <div
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '12px',
+                          background: 'rgba(0, 255, 85, 0.1)',
+                          border: '1px solid rgba(0, 255, 85, 0.3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.5rem',
+                        }}
+                      >
+                        {activeAqiOption === 'tree' ? '🌳' : activeAqiOption === 'garden' ? '🌿' : '💨'}
+                      </div>
+                      <div>
+                        <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.25rem', color: '#fff', margin: 0 }}>
+                          {activeAqiOption === 'tree' ? 'Tree Impact Summary' : activeAqiOption === 'garden' ? 'Vertical Garden Impact' : 'Air Purifier Impact'}
+                        </h3>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '20px',
+                            background: activeAqiOption === 'purifier' ? 'rgba(100, 150, 255, 0.2)' : 'rgba(0, 255, 85, 0.15)',
+                            color: activeAqiOption === 'purifier' ? '#6496ff' : '#00ff55',
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            fontSize: '0.7rem',
+                            marginTop: '0.5rem',
+                          }}
+                        >
+                          {activeAqiOption === 'purifier' ? '🏠 Indoor Impact' : '🌿 Outdoor Impact'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {activeAqiOption === 'tree' && (
+                        <>
+                          <StatRow label="Tree Type" value="Mango" />
+                          <StatRow label="AQI Improvement" value="-2 points" valueColor="#00ff55" />
+                          <StatRow label="PM2.5 Reduction" value="-0.33 µg/m³" valueColor="#00ff55" />
+                          <StatRow label="PM10 Reduction" value="-0.49 µg/m³" valueColor="#00ff55" />
+                          <StatRow label="Coverage Radius" value="20m" />
+                          <StatRow label="CO₂ Absorbed" value="18 kg/year" valueColor="#00ff55" />
+                          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />
+                          <StatRow label="One-time Cost" value="₹768" />
+                          <StatRow label="Maintenance" value="₹60/month" valueColor="#00ff55" />
+                        </>
+                      )}
+                      {activeAqiOption === 'garden' && (
+                        <>
+                          <StatRow label="Area Installed" value="14 m²" />
+                          <StatRow label="AQI Improvement" value="-15 points" valueColor="#00ff55" />
+                          <StatRow label="PM2.5 Reduction" value="-6.29 µg/m³" valueColor="#00ff55" />
+                          <StatRow label="Temperature Drop" value="-1.9°C" valueColor="#00ff55" />
+                          <StatRow label="Noise Reduction" value="-4.8 dB" valueColor="#00ff55" />
+                          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />
+                          <StatRow label="Cost per m²" value="₹1,861" />
+                          <StatRow label="Total Cost" value="₹26,054" />
+                          <StatRow label="Maintenance" value="₹431/month" valueColor="#00ff55" />
+                        </>
+                      )}
+                      {activeAqiOption === 'purifier' && (
+                        <>
+                          <StatRow label="Room Coverage" value="369 sq ft" />
+                          <StatRow label="Indoor PM2.5 Drop" value="-86%" valueColor="#00ff55" />
+                          <StatRow label="CADR" value="386 m³/hr" />
+                          <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />
+                          <StatRow label="Device Cost" value="₹15,299" />
+                          <StatRow label="Filter Replacement" value="₹2,406 / 6 months" valueColor="#00ff55" />
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ===== WATER FEATURE ===== */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '4rem' }}
+          >
+            {/* Water Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '2rem' }}>💧</span>
+              <h3
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: '1.75rem',
+                  fontWeight: 600,
+                  color: '#6496ff',
+                  margin: 0,
+                }}
+              >
+                Water Harvesting
+              </h3>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '2rem',
+                background: 'linear-gradient(135deg, rgba(20, 25, 30, 0.9) 0%, rgba(10, 15, 20, 0.95) 100%)',
+                borderRadius: '24px',
+                border: '1px solid rgba(100, 150, 255, 0.2)',
+                overflow: 'hidden',
+                minHeight: '400px',
+              }}
+            >
+              {/* Left - Water Visual */}
+              <div
+                style={{
+                  padding: '2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'radial-gradient(circle at center, rgba(100, 150, 255, 0.05) 0%, transparent 70%)',
+                }}
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '4rem', fontFamily: "'Outfit', sans-serif", fontWeight: 700, color: '#6496ff', lineHeight: 1 }}>4492</div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1rem', color: 'rgba(255, 255, 255, 0.5)', letterSpacing: '0.2em', marginBottom: '1.5rem' }}>LITERS / DAY</div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2rem', fontWeight: 600, color: '#6496ff', marginBottom: '0.5rem' }}>85% Efficiency</div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.4)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Estimated Collection</div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.25rem', fontWeight: 600, color: '#ffffff', marginTop: '0.5rem' }}>Rainwater Harvesting Model</div>
+                </div>
+              </div>
+
+              {/* Right - Water Stats */}
+              <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      background: 'rgba(100, 150, 255, 0.1)',
+                      border: '1px solid rgba(100, 150, 255, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                    }}
+                  >
+                    💧
+                  </div>
+                  <div>
+                    <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.25rem', color: '#fff', margin: 0 }}>Water Harvesting Summary</h3>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '20px',
+                        background: 'rgba(100, 150, 255, 0.15)',
+                        color: '#6496ff',
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontSize: '0.7rem',
+                        marginTop: '0.5rem',
+                      }}
+                    >
+                      💧 Active System
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <StatRow label="Daily Collection" value="4,492 L" valueColor="#6496ff" />
+                  <StatRow label="System Efficiency" value="85%" valueColor="#6496ff" />
+                  <StatRow label="Roof Area" value="250 m²" />
+                  <StatRow label="Tank Capacity" value="10,000 L" />
+                  <StatRow label="Annual Savings" value="₹42,000" valueColor="#6496ff" />
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />
+                  <StatRow label="Installation Cost" value="₹85,000" />
+                  <StatRow label="Payback Period" value="~2 years" valueColor="#6496ff" />
+                  <StatRow label="Maintenance" value="₹500/month" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ===== SOLAR FEATURE ===== */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Solar Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '2rem' }}>☀️</span>
+              <h3
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: '1.75rem',
+                  fontWeight: 600,
+                  color: '#ff9632',
+                  margin: 0,
+                }}
+              >
+                Solar Energy
+              </h3>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '2rem',
+                background: 'linear-gradient(135deg, rgba(30, 25, 15, 0.9) 0%, rgba(20, 15, 10, 0.95) 100%)',
+                borderRadius: '24px',
+                border: '1px solid rgba(255, 150, 50, 0.2)',
+                overflow: 'hidden',
+                minHeight: '400px',
+              }}
+            >
+              {/* Left - Solar Visual */}
+              <div
+                style={{
+                  padding: '2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'radial-gradient(circle at center, rgba(255, 150, 50, 0.05) 0%, transparent 70%)',
+                }}
+              >
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>☀️</div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.75rem', color: '#ff9632', letterSpacing: '0.2em', marginBottom: '0.5rem' }}>SOLAR YIELD</div>
+                  <div style={{ fontSize: '4rem', fontFamily: "'Outfit', sans-serif", fontWeight: 700, color: '#ff9632', lineHeight: 1 }}>19.66 kW</div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.4)', marginBottom: '1.5rem' }}>Estimated System Size</div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.5rem', fontWeight: 700, color: '#ffffff' }}>₹21,045</div>
+                  <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.5)' }}>SAVINGS / MONTH</div>
+                </div>
+              </div>
+
+              {/* Right - Solar Stats */}
+              <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      background: 'rgba(255, 150, 50, 0.1)',
+                      border: '1px solid rgba(255, 150, 50, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                    }}
+                  >
+                    ☀️
+                  </div>
+                  <div>
+                    <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.25rem', color: '#fff', margin: 0 }}>Solar Energy Summary</h3>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '20px',
+                        background: 'rgba(255, 150, 50, 0.15)',
+                        color: '#ff9632',
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        fontSize: '0.7rem',
+                        marginTop: '0.5rem',
+                      }}
+                    >
+                      ⚡ Active Generation
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <StatRow label="System Size" value="19.66 kW" valueColor="#ff9632" />
+                  <StatRow label="Energy/Year" value="31,563 kWh" valueColor="#ff9632" />
+                  <StatRow label="Sun Hours" value="4.1 hrs/day" />
+                  <StatRow label="Roof Area" value="374 m²" />
+                  <StatRow label="Monthly Savings" value="₹21,045" valueColor="#ff9632" />
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '0.25rem 0' }} />
+                  <StatRow label="Installation Cost" value="₹9,83,000" />
+                  <StatRow label="Payback Period" value="~4 years" valueColor="#ff9632" />
+                  <StatRow label="Panel Efficiency" value="80% fill" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
         </motion.div>
       </div>
 
