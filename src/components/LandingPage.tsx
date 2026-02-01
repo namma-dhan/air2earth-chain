@@ -9,6 +9,8 @@ const LandingPage = () => {
   const titleRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const letsGoRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const features = [
     { id: 'aqi', title: 'AQI', description: 'Real-time air quality monitoring and pollution tracking across cities', route: '/aqi' },
@@ -93,6 +95,58 @@ const LandingPage = () => {
     }
   }, []);
 
+  // Handle video and audio synchronization
+  useEffect(() => {
+    const video = videoRef.current;
+    const audio = audioRef.current;
+
+    if (!video || !audio) return;
+
+    // Function to play audio when video plays
+    const handleVideoPlay = () => {
+      audio.play().catch(() => {
+        // Autoplay may be blocked, user interaction needed
+      });
+    };
+
+    // Function to pause audio when video pauses
+    const handleVideoPause = () => {
+      audio.pause();
+    };
+
+    // Loop both video and audio when video ends
+    const handleVideoEnded = () => {
+      video.currentTime = 0;
+      audio.currentTime = 0;
+      video.play();
+      audio.play().catch(() => {});
+    };
+
+    // Start playing on user interaction (click anywhere)
+    const handleUserInteraction = () => {
+      if (video.paused) {
+        video.play();
+      }
+      audio.play().catch(() => {});
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    video.addEventListener('play', handleVideoPlay);
+    video.addEventListener('pause', handleVideoPause);
+    video.addEventListener('ended', handleVideoEnded);
+    document.addEventListener('click', handleUserInteraction);
+
+    // Try to autoplay
+    video.play().catch(() => {});
+
+    return () => {
+      video.removeEventListener('play', handleVideoPlay);
+      video.removeEventListener('pause', handleVideoPause);
+      video.removeEventListener('ended', handleVideoEnded);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
+
   const handleLetsGoClick = () => {
     setIsPopupOpen(true);
   };
@@ -116,10 +170,6 @@ const LandingPage = () => {
           minHeight: '100vh',
           width: '100%',
           backgroundColor: '#000000',
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url("/assets/aqi/nature.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
@@ -127,12 +177,46 @@ const LandingPage = () => {
           padding: '4rem',
         }}
       >
+        {/* Video Background */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src="/assets/aqi/nature.mp4" type="video/mp4" />
+        </video>
+        {/* Background Audio */}
+        <audio ref={audioRef} src="/assets/aqi/nature.mp3" preload="auto" />
+        {/* Dark Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7))',
+            zIndex: 1,
+          }}
+        />
         {/* Top Center - AeroEarth Title */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
             marginBottom: '6rem',
+            position: 'relative',
+            zIndex: 2,
           }}
         >
           <div
@@ -174,6 +258,8 @@ const LandingPage = () => {
             width: '100%',
             paddingLeft: '2rem',
             paddingRight: '8rem',
+            position: 'relative',
+            zIndex: 2,
           }}
         >
           {/* Description - Left to Center */}
@@ -739,10 +825,7 @@ const LandingPage = () => {
                 gap: '3rem',
                 padding: '4rem 5rem',
                 borderRadius: '32px',
-                backgroundImage: 'linear-gradient(rgba(0, 15, 8, 0.85), rgba(0, 15, 8, 0.9)), url("/assets/aqi/nature.png")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
+                overflow: 'hidden',
                 border: '1px solid rgba(0, 255, 85, 0.3)',
                 boxShadow: '0 0 150px rgba(0, 255, 85, 0.15), 0 25px 80px rgba(0, 0, 0, 0.5)',
                 maxWidth: '90vw',
@@ -751,6 +834,36 @@ const LandingPage = () => {
                 maxHeight: '80vh',
               }}
             >
+              {/* Video Background for Popup */}
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  zIndex: 0,
+                }}
+              >
+                <source src="/assets/aqi/nature.mp4" type="video/mp4" />
+              </video>
+              {/* Dark Overlay for Popup */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(rgba(0, 15, 8, 0.85), rgba(0, 15, 8, 0.9))',
+                  zIndex: 1,
+                }}
+              />
               <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -762,12 +875,14 @@ const LandingPage = () => {
                   color: '#00ff55',
                   margin: 0,
                   letterSpacing: '0.05em',
+                  position: 'relative',
+                  zIndex: 2,
                 }}
               >
                 Choose Your Experience
               </motion.h2>
 
-              <div style={{ display: 'flex', gap: '1.5rem', width: '100%', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '1.5rem', width: '100%', justifyContent: 'center', position: 'relative', zIndex: 2 }}>
                 {features.map((feature, index) => (
                   <motion.button
                     key={feature.id}
