@@ -64,92 +64,228 @@ const LandingPage = () => {
   const titleText = 'AEROEARTH';
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100%',
-        backgroundColor: '#000000',
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url("/assets/aqi/nature.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-        padding: '4rem',
-      }}
-    >
-      {/* Top Center - AeroEarth Title */}
+    <>
+      {/* Hero Section */}
       <div
         style={{
+          minHeight: '100vh',
+          width: '100%',
+          backgroundColor: '#000000',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url("/assets/aqi/nature.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '6rem',
+          flexDirection: 'column',
+          position: 'relative',
+          overflow: 'hidden',
+          padding: '4rem',
         }}
       >
+        {/* Top Center - AeroEarth Title */}
         <div
-          ref={titleRef}
           style={{
             display: 'flex',
-            perspective: '1000px',
+            justifyContent: 'center',
+            marginBottom: '6rem',
           }}
         >
-          {titleText.split('').map((letter, index) => (
-            <span
-              key={index}
-              className="title-letter"
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontSize: 'clamp(3rem, 10vw, 8rem)',
-                fontWeight: 900,
-                color: '#00ff55',
-                display: 'inline-block',
-                textShadow: '0 0 80px rgba(0, 255, 85, 0.4)',
-                willChange: 'transform, opacity',
-              }}
-            >
-              {letter}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Content Area - Description (left-center) + Let's Go (right of center) */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flex: 1,
-          maxWidth: '1400px',
-          margin: '0 auto',
-          width: '100%',
-          paddingLeft: '2rem',
-          paddingRight: '8rem',
-        }}
-      >
-        {/* Description - Left to Center */}
-        <div
-          style={{
-            maxWidth: '55%',
-          }}
-        >
-          {/* Label */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
+          <div
+            ref={titleRef}
             style={{
               display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              marginBottom: '1.5rem',
+              perspective: '1000px',
+            }}
+          >
+            {titleText.split('').map((letter, index) => (
+              <span
+                key={index}
+                className="title-letter"
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: 'clamp(3rem, 10vw, 8rem)',
+                  fontWeight: 900,
+                  color: '#00ff55',
+                  display: 'inline-block',
+                  textShadow: '0 0 80px rgba(0, 255, 85, 0.4)',
+                  willChange: 'transform, opacity',
+                }}
+              >
+                {letter}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Area - Description (left-center) + Let's Go (right of center) */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flex: 1,
+            maxWidth: '1400px',
+            margin: '0 auto',
+            width: '100%',
+            paddingLeft: '2rem',
+            paddingRight: '8rem',
+          }}
+        >
+          {/* Description - Left to Center */}
+          <div
+            style={{
+              maxWidth: '55%',
+            }}
+          >
+            {/* Label */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <span
+                style={{
+                  width: '40px',
+                  height: '2px',
+                  backgroundColor: '#00ff55',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '0.85rem',
+                  color: '#00ff55',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Earth Intelligence Platform
+              </span>
+            </motion.div>
+
+            {/* Long Description */}
+            <p
+              ref={descRef}
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 'clamp(1.1rem, 2vw, 1.5rem)',
+                fontWeight: 400,
+                color: 'rgba(255, 255, 255, 0.7)',
+                lineHeight: 1.9,
+                margin: 0,
+                opacity: 0,
+              }}
+            >
+              Experience the future of environmental monitoring with our high-fidelity
+              autonomous climate tracking system. We combine advanced geospatial intelligence
+              with precision bio-seeding technology to redefine planetary health.
+              Monitor air quality, harness solar potential, and track urban ecosystem vitality
+              — all through a unified digital twin platform.
+            </p>
+          </div>
+
+          {/* Let's Go - Slightly left of right edge */}
+          <motion.div
+            ref={letsGoRef}
+            onClick={handleLetsGoClick}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              cursor: 'pointer',
+              opacity: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
             }}
           >
             <span
               style={{
-                width: '40px',
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+                fontWeight: 900,
+                color: 'transparent',
+                WebkitTextStroke: '2px #00ff55',
+                letterSpacing: '-0.02em',
+                display: 'block',
+                lineHeight: 1.1,
+                textAlign: 'right',
+              }}
+            >
+              LET'S
+            </span>
+            <span
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+                fontWeight: 900,
+                color: '#00ff55',
+                letterSpacing: '-0.02em',
+                display: 'block',
+                lineHeight: 1.1,
+                textAlign: 'right',
+                textShadow: '0 0 60px rgba(0, 255, 85, 0.6)',
+              }}
+            >
+              GO.
+            </span>
+            <motion.div
+              animate={{ x: [0, 12, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+              style={{
+                marginTop: '0.75rem',
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '1.75rem',
+                  color: '#00ff55',
+                }}
+              >
+                →
+              </span>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Competitive Landscape Section - Separate Black Background */}
+      <div
+        style={{
+          width: '100%',
+          backgroundColor: '#000000',
+          padding: '6rem 2rem',
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8 }}
+          style={{
+            width: '100%',
+            maxWidth: '1400px',
+            margin: '0 auto',
+          }}
+        >
+          {/* Section Label */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              marginBottom: '1rem',
+            }}
+          >
+            <span
+              style={{
+                width: '30px',
                 height: '2px',
                 backgroundColor: '#00ff55',
               }}
@@ -157,98 +293,205 @@ const LandingPage = () => {
             <span
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.85rem',
+                fontSize: '0.75rem',
                 color: '#00ff55',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
               }}
             >
-              Earth Intelligence Platform
+              Competitive Landscape
             </span>
-          </motion.div>
+          </div>
 
-          {/* Long Description */}
+          {/* Section Title */}
+          <h2
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 700,
+              color: '#ffffff',
+              margin: '0 0 0.75rem 0',
+            }}
+          >
+            Current Competitors
+          </h2>
+
+          {/* Section Description */}
           <p
-            ref={descRef}
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: 'clamp(1.1rem, 2vw, 1.5rem)',
-              fontWeight: 400,
-              color: 'rgba(255, 255, 255, 0.7)',
-              lineHeight: 1.9,
-              margin: 0,
-              opacity: 0,
+              fontSize: '1rem',
+              color: 'rgba(255, 255, 255, 0.5)',
+              margin: '0 0 2rem 0',
+              maxWidth: '700px',
             }}
           >
-            Experience the future of environmental monitoring with our high-fidelity
-            autonomous climate tracking system. We combine advanced geospatial intelligence
-            with precision bio-seeding technology to redefine planetary health.
-            Monitor air quality, harness solar potential, and track urban ecosystem vitality
-            — all through a unified digital twin platform.
+            Few integrate solar, rain, and pollution in accessible 3D; most remain siloed in legacy GIS tools. AeroEarth bridges the gap.
           </p>
-        </div>
 
-        {/* Let's Go - Slightly left of right edge */}
-        <motion.div
-          ref={letsGoRef}
-          onClick={handleLetsGoClick}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-          style={{
-            cursor: 'pointer',
-            opacity: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-          }}
-        >
-          <span
+          {/* Competitors Table */}
+          <div
             style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-              fontWeight: 900,
-              color: 'transparent',
-              WebkitTextStroke: '2px #00ff55',
-              letterSpacing: '-0.02em',
-              display: 'block',
-              lineHeight: 1.1,
-              textAlign: 'right',
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderRadius: '16px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              overflow: 'hidden',
             }}
           >
-            LET'S
-          </span>
-          <span
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-              fontWeight: 900,
-              color: '#00ff55',
-              letterSpacing: '-0.02em',
-              display: 'block',
-              lineHeight: 1.1,
-              textAlign: 'right',
-              textShadow: '0 0 60px rgba(0, 255, 85, 0.6)',
-            }}
-          >
-            GO.
-          </span>
-          <motion.div
-            animate={{ x: [0, 12, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-            style={{
-              marginTop: '0.75rem',
-            }}
-          >
-            <span
+            {/* Table Header */}
+            <div
               style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '1.75rem',
-                color: '#00ff55',
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 1fr 1.5fr 1.5fr',
+                gap: '1rem',
+                padding: '1rem 1.5rem',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'rgba(0, 0, 0, 0.3)',
               }}
             >
-              →
-            </span>
-          </motion.div>
+              {['COMPETITOR', 'STRENGTHS', 'WEAKNESSES', 'OUR EDGE'].map((header, i) => (
+                <span
+                  key={header}
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '0.85rem',
+                    fontWeight: 500,
+                    color: i === 3 ? '#00ff55' : 'rgba(255, 255, 255, 0.4)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {header}
+                </span>
+              ))}
+            </div>
+
+            {/* Table Rows */}
+            {[
+              {
+                name: 'Solargis/Augos',
+                icon: '☀️',
+                strengths: 'Accurate PV yield.',
+                strengthsTag: 'augos +5',
+                weaknesses: '2D maps, no rain/pollution, enterprise-only.',
+                edge: 'Free consumer 3D click-to-predict; multi-feature.',
+              },
+              {
+                name: 'Esri ArcGIS Urban',
+                icon: '🏙️',
+                strengths: 'Procedural cities, GIS depth.',
+                strengthsTag: 'Frigol$i',
+                weaknesses: 'Expensive ($10K+/yr), steep learning.',
+                edge: 'CesiumJS web-free, gamified UX for homeowners.',
+              },
+              {
+                name: 'Ladybug/SimStadt',
+                icon: '🐞',
+                strengths: 'Solar sims in Rhino/Grass.',
+                strengthsTag: 'sims - emails',
+                weaknesses: 'Offline, architect-focused, no commercial pitch.',
+                edge: 'Real-time Cesium + commercial ROI calculator.',
+              },
+              {
+                name: 'DROP (Rain)',
+                icon: '💧',
+                strengths: 'Harvest sizing.',
+                strengthsTag: 'FreeFlush',
+                weaknesses: '2D static, no 3D/solar.',
+                edge: 'Integrated 3D with wind/groundwater viz.',
+              },
+              {
+                name: 'CleanMax (India)',
+                icon: '🏠',
+                strengths: 'Rooftop installs.',
+                strengthsTag: '3ins2',
+                weaknesses: 'No viz tool.',
+                edge: 'Your SaaS convinces their leads.',
+              },
+            ].map((row, index) => (
+              <div
+                key={row.name}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1.2fr 1fr 1.5fr 1.5fr',
+                  gap: '1rem',
+                  padding: '1.25rem 1.5rem',
+                  borderBottom: index < 4 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+                  transition: 'background 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(0, 255, 85, 0.03)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                {/* Competitor Name */}
+                <span
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    color: '#ffffff',
+                  }}
+                >
+                  {row.name}
+                </span>
+
+                {/* Strengths */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <span
+                    style={{
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: '1rem',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {row.strengths}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: '0.75rem',
+                      color: '#00ff55',
+                      padding: '0.25rem 0.6rem',
+                      background: 'rgba(0, 255, 85, 0.1)',
+                      borderRadius: '4px',
+                      width: 'fit-content',
+                    }}
+                  >
+                    {row.strengthsTag}
+                  </span>
+                </div>
+
+                {/* Weaknesses */}
+                <span
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '1rem',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {row.weaknesses}
+                </span>
+
+                {/* Your Edge */}
+                <span
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '1rem',
+                    color: '#00ff55',
+                    lineHeight: 1.5,
+                    fontWeight: 500,
+                  }}
+                >
+                  {row.edge}
+                </span>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
 
@@ -391,7 +634,7 @@ const LandingPage = () => {
           </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 
