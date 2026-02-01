@@ -16,6 +16,51 @@ const LandingPage = () => {
     { id: 'solar', title: 'Solar', description: 'Solar energy potential mapping and renewable power insights', route: '/solar' },
   ];
 
+  const [activeCard, setActiveCard] = useState(0);
+
+  const competitors = [
+    {
+      name: 'Solargis / Augos',
+      icon: '☀️',
+      strengths: 'Highly accurate PV yield estimations and established industry reputation.',
+      weaknesses: 'Restricted to 2D mapping environment, Absence of rain/pollution integration',
+      edgeTitle: 'Democratized 3D analysis with click-to-predict multi-feature overlays.',
+      edgeDesc: 'Instant visual intelligence that transcends legacy 2D spreadsheets.',
+    },
+    {
+      name: 'Esri ArcGIS Urban',
+      icon: '🏙️',
+      strengths: 'Procedural city generation with deep GIS integration capabilities.',
+      weaknesses: 'Expensive ($10K+/yr), Steep learning curve for new users',
+      edgeTitle: 'CesiumJS web-free platform with gamified UX for homeowners.',
+      edgeDesc: 'No enterprise lock-in. Accessible environmental insights for everyone.',
+    },
+    {
+      name: 'Ladybug / SimStadt',
+      icon: '🐞',
+      strengths: 'Advanced solar simulations in Rhino/Grasshopper environments.',
+      weaknesses: 'Offline-only, Architect-focused, No commercial pitch tools',
+      edgeTitle: 'Real-time Cesium + commercial ROI calculator built-in.',
+      edgeDesc: 'From simulation to sales pitch in one seamless workflow.',
+    },
+    {
+      name: 'DROP (Rain)',
+      icon: '💧',
+      strengths: 'Rainwater harvest sizing calculations and water management.',
+      weaknesses: '2D static visualizations, No 3D or solar integration',
+      edgeTitle: 'Integrated 3D with wind & groundwater visualization.',
+      edgeDesc: 'Unified environmental intelligence across all resource types.',
+    },
+    {
+      name: 'CleanMax (India)',
+      icon: '🏠',
+      strengths: 'Established rooftop solar installation network in India.',
+      weaknesses: 'No visualization tools, Limited digital engagement',
+      edgeTitle: 'Your SaaS platform convinces their leads.',
+      edgeDesc: 'White-label ready. Turn installers into digital-first sellers.',
+    },
+  ];
+
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
@@ -274,223 +319,385 @@ const LandingPage = () => {
             margin: '0 auto',
           }}
         >
-          {/* Section Label */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginBottom: '1rem',
-            }}
-          >
-            <span
-              style={{
-                width: '30px',
-                height: '2px',
-                backgroundColor: '#00ff55',
-              }}
-            />
-            <span
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.75rem',
-                color: '#00ff55',
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Competitive Landscape
-            </span>
-          </div>
-
-          {/* Section Title */}
-          <h2
-            style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
-              fontWeight: 700,
-              color: '#ffffff',
-              margin: '0 0 0.75rem 0',
-            }}
-          >
-            Current Competitors
-          </h2>
-
-          {/* Section Description */}
-          <p
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '1rem',
-              color: 'rgba(255, 255, 255, 0.5)',
-              margin: '0 0 2rem 0',
-              maxWidth: '700px',
-            }}
-          >
-            Few integrate solar, rain, and pollution in accessible 3D; most remain siloed in legacy GIS tools. AeroEarth bridges the gap.
-          </p>
-
-          {/* Competitors Table */}
-          <div
-            style={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderRadius: '16px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Table Header */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.2fr 1fr 1.5fr 1.5fr',
-                gap: '1rem',
-                padding: '1rem 1.5rem',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                background: 'rgba(0, 0, 0, 0.3)',
-              }}
-            >
-              {['COMPETITOR', 'STRENGTHS', 'WEAKNESSES', 'OUR EDGE'].map((header, i) => (
+          {/* Left Side - Title & Description */}
+          <div style={{ display: 'flex', gap: '4rem', alignItems: 'flex-start' }}>
+            <div style={{ flex: '0 0 280px' }}>
+              {/* Section Label */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '1.5rem',
+                }}
+              >
                 <span
-                  key={header}
+                  style={{
+                    width: '30px',
+                    height: '2px',
+                    backgroundColor: '#00ff55',
+                  }}
+                />
+                <span
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: '0.85rem',
-                    fontWeight: 500,
-                    color: i === 3 ? '#00ff55' : 'rgba(255, 255, 255, 0.4)',
-                    letterSpacing: '0.15em',
+                    fontSize: '0.75rem',
+                    color: '#00ff55',
+                    letterSpacing: '0.25em',
                     textTransform: 'uppercase',
                   }}
                 >
-                  {header}
+                  Intelligence Stack
                 </span>
-              ))}
-            </div>
+              </div>
 
-            {/* Table Rows */}
-            {[
-              {
-                name: 'Solargis/Augos',
-                icon: '☀️',
-                strengths: 'Accurate PV yield.',
-                strengthsTag: 'augos +5',
-                weaknesses: '2D maps, no rain/pollution, enterprise-only.',
-                edge: 'Free consumer 3D click-to-predict; multi-feature.',
-              },
-              {
-                name: 'Esri ArcGIS Urban',
-                icon: '🏙️',
-                strengths: 'Procedural cities, GIS depth.',
-                strengthsTag: 'Frigol$i',
-                weaknesses: 'Expensive ($10K+/yr), steep learning.',
-                edge: 'CesiumJS web-free, gamified UX for homeowners.',
-              },
-              {
-                name: 'Ladybug/SimStadt',
-                icon: '🐞',
-                strengths: 'Solar sims in Rhino/Grass.',
-                strengthsTag: 'sims - emails',
-                weaknesses: 'Offline, architect-focused, no commercial pitch.',
-                edge: 'Real-time Cesium + commercial ROI calculator.',
-              },
-              {
-                name: 'DROP (Rain)',
-                icon: '💧',
-                strengths: 'Harvest sizing.',
-                strengthsTag: 'FreeFlush',
-                weaknesses: '2D static, no 3D/solar.',
-                edge: 'Integrated 3D with wind/groundwater viz.',
-              },
-              {
-                name: 'CleanMax (India)',
-                icon: '🏠',
-                strengths: 'Rooftop installs.',
-                strengthsTag: '3ins2',
-                weaknesses: 'No viz tool.',
-                edge: 'Your SaaS convinces their leads.',
-              },
-            ].map((row, index) => (
-              <div
-                key={row.name}
+              {/* Section Title */}
+              <h2
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.2fr 1fr 1.5fr 1.5fr',
-                  gap: '1rem',
-                  padding: '1.25rem 1.5rem',
-                  borderBottom: index < 4 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
-                  transition: 'background 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 255, 85, 0.03)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  margin: '0 0 0.5rem 0',
+                  lineHeight: 1.1,
                 }}
               >
-                {/* Competitor Name */}
-                <span
+                Market
+              </h2>
+              <h2
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                  fontWeight: 700,
+                  color: '#00ff55',
+                  margin: '0 0 2rem 0',
+                  lineHeight: 1.1,
+                  fontStyle: 'italic',
+                }}
+              >
+                Synthesis
+              </h2>
+
+              {/* Section Description */}
+              <p
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '1rem',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  margin: '0 0 3rem 0',
+                  lineHeight: 1.7,
+                }}
+              >
+                Evaluating the legacy landscape against our next-generation environmental intelligence framework.
+              </p>
+
+              {/* Navigation Controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <motion.button
+                  onClick={() => setActiveCard((prev) => (prev === 0 ? competitors.length - 1 : prev - 1))}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
                   style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    color: '#ffffff',
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'transparent',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.25rem',
                   }}
                 >
-                  {row.name}
-                </span>
-
-                {/* Strengths */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span
-                    style={{
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontSize: '1rem',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {row.strengths}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontSize: '0.75rem',
-                      color: '#00ff55',
-                      padding: '0.25rem 0.6rem',
-                      background: 'rgba(0, 255, 85, 0.1)',
-                      borderRadius: '4px',
-                      width: 'fit-content',
-                    }}
-                  >
-                    {row.strengthsTag}
-                  </span>
-                </div>
-
-                {/* Weaknesses */}
+                  ←
+                </motion.button>
+                <motion.button
+                  onClick={() => setActiveCard((prev) => (prev === competitors.length - 1 ? 0 : prev + 1))}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    border: '2px solid #00ff55',
+                    background: 'rgba(0, 255, 85, 0.1)',
+                    color: '#00ff55',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.25rem',
+                  }}
+                >
+                  →
+                </motion.button>
                 <span
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: '1rem',
                     color: 'rgba(255, 255, 255, 0.5)',
-                    lineHeight: 1.5,
+                    marginLeft: '0.5rem',
                   }}
                 >
-                  {row.weaknesses}
-                </span>
-
-                {/* Your Edge */}
-                <span
-                  style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: '1rem',
-                    color: '#00ff55',
-                    lineHeight: 1.5,
-                    fontWeight: 500,
-                  }}
-                >
-                  {row.edge}
+                  {String(activeCard + 1).padStart(2, '0')} / {String(competitors.length).padStart(2, '0')}
                 </span>
               </div>
-            ))}
+            </div>
+
+            {/* Right Side - Stacked Cards */}
+            <div
+              style={{
+                flex: 1,
+                position: 'relative',
+                height: '500px',
+                perspective: '1000px',
+              }}
+            >
+              <AnimatePresence mode="popLayout">
+                {competitors.map((competitor, index) => {
+                  const position = (index - activeCard + competitors.length) % competitors.length;
+                  const isActive = position === 0;
+                  const offset = position * 15;
+                  const scale = 1 - position * 0.04;
+                  const zIndex = competitors.length - position;
+                  const opacity = position > 2 ? 0 : 1 - position * 0.25;
+
+                  return (
+                    <motion.div
+                      key={competitor.name}
+                      onClick={() => isActive && setActiveCard((prev) => (prev === competitors.length - 1 ? 0 : prev + 1))}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{
+                        opacity,
+                        x: offset,
+                        y: offset,
+                        scale,
+                        zIndex,
+                      }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        width: '100%',
+                        height: '460px',
+                        display: 'grid',
+                        gridTemplateColumns: '1.2fr 1fr',
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        cursor: isActive ? 'pointer' : 'default',
+                        transformOrigin: 'top left',
+                      }}
+                    >
+                      {/* Left Side - Competitor Info */}
+                      <div
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(30, 35, 30, 0.95) 0%, rgba(20, 25, 20, 0.98) 100%)',
+                          backdropFilter: 'blur(20px)',
+                          padding: '2.5rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRight: 'none',
+                          borderRadius: '24px 0 0 24px',
+                        }}
+                      >
+                        {/* Company Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                          <div
+                            style={{
+                              width: '56px',
+                              height: '56px',
+                              borderRadius: '12px',
+                              background: 'rgba(0, 255, 85, 0.1)',
+                              border: '1px solid rgba(0, 255, 85, 0.3)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '1.5rem',
+                            }}
+                          >
+                            {competitor.icon}
+                          </div>
+                          <div>
+                            <h3
+                              style={{
+                                fontFamily: "'Outfit', sans-serif",
+                                fontSize: '1.5rem',
+                                fontWeight: 600,
+                                color: '#ffffff',
+                                margin: 0,
+                              }}
+                            >
+                              {competitor.name}
+                            </h3>
+                            <span
+                              style={{
+                                fontFamily: "'Space Grotesk', sans-serif",
+                                fontSize: '0.75rem',
+                                color: 'rgba(255, 255, 255, 0.4)',
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              Status: Legacy Standard
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Core Strengths */}
+                        <div style={{ marginBottom: '2rem' }}>
+                          <span
+                            style={{
+                              fontFamily: "'Space Grotesk', sans-serif",
+                              fontSize: '0.7rem',
+                              color: 'rgba(255, 255, 255, 0.4)',
+                              letterSpacing: '0.15em',
+                              textTransform: 'uppercase',
+                              display: 'block',
+                              marginBottom: '0.75rem',
+                            }}
+                          >
+                            Core Strengths
+                          </span>
+                          <p
+                            style={{
+                              fontFamily: "'Space Grotesk', sans-serif",
+                              fontSize: '1.1rem',
+                              color: 'rgba(255, 255, 255, 0.8)',
+                              margin: 0,
+                              lineHeight: 1.6,
+                            }}
+                          >
+                            {competitor.strengths}
+                          </p>
+                        </div>
+
+                        {/* Known Limitations */}
+                        <div style={{ flex: 1 }}>
+                          <span
+                            style={{
+                              fontFamily: "'Space Grotesk', sans-serif",
+                              fontSize: '0.7rem',
+                              color: 'rgba(255, 255, 255, 0.4)',
+                              letterSpacing: '0.15em',
+                              textTransform: 'uppercase',
+                              display: 'block',
+                              marginBottom: '0.75rem',
+                            }}
+                          >
+                            Known Limitations
+                          </span>
+                          <ul
+                            style={{
+                              fontFamily: "'Space Grotesk', sans-serif",
+                              fontSize: '1rem',
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              margin: 0,
+                              paddingLeft: '1.25rem',
+                              lineHeight: 1.8,
+                            }}
+                          >
+                            {competitor.weaknesses.split(', ').map((w, i) => (
+                              <li key={i}>{w}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                          <span
+                            style={{
+                              fontFamily: "'Space Grotesk', sans-serif",
+                              fontSize: '0.7rem',
+                              color: 'rgba(255, 255, 255, 0.3)',
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            System Analytics v4.0.1
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right Side - Our Edge */}
+                      <div
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(0, 30, 15, 0.95) 0%, rgba(0, 20, 10, 0.98) 100%)',
+                          backdropFilter: 'blur(20px)',
+                          padding: '2.5rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          border: '1px solid rgba(0, 255, 85, 0.2)',
+                          borderLeft: '1px solid rgba(0, 255, 85, 0.3)',
+                          borderRadius: '0 24px 24px 0',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            fontSize: '0.7rem',
+                            color: '#00ff55',
+                            letterSpacing: '0.2em',
+                            textTransform: 'uppercase',
+                            marginBottom: '1.5rem',
+                          }}
+                        >
+                          Our Edge
+                        </span>
+
+                        <h3
+                          style={{
+                            fontFamily: "'Outfit', sans-serif",
+                            fontSize: 'clamp(1.75rem, 3vw, 2.5rem)',
+                            fontWeight: 700,
+                            color: '#00ff55',
+                            margin: '0 0 2rem 0',
+                            lineHeight: 1.2,
+                            textShadow: '0 0 40px rgba(0, 255, 85, 0.3)',
+                          }}
+                        >
+                          {competitor.edgeTitle}
+                        </h3>
+
+                        <p
+                          style={{
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            fontSize: '1rem',
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            margin: 0,
+                            lineHeight: 1.7,
+                            flex: 1,
+                          }}
+                        >
+                          {competitor.edgeDesc}
+                        </p>
+
+                        {/* Dots Indicator */}
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '2rem' }}>
+                          {competitors.map((_, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: i === activeCard ? '#00ff55' : 'rgba(0, 255, 85, 0.2)',
+                                transition: 'background 0.3s ease',
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
           </div>
         </motion.div>
       </div>
