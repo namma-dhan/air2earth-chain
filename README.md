@@ -1,75 +1,146 @@
-# React + TypeScript + Vite
+# 🌍 AeroEarth: On-Chain Earth Intelligence
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
+  <!-- TODO: Drop your banner image here -->
+  <img src="./public/banner-placeholder.png" alt="AeroEarth Banner" width="100%" />
+</div>
 
-Currently, two official plugins are available : 
+## 📌 The Vision
+**AeroEarth** is where environmental action meets blockchain truth. It’s a 3D digital twin of our planet that lets you visualize live air quality (AQI) data and take verifiable climate action. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Instead of just looking at stats, users can interact with the 3D globe to "plant" virtual trees or add green infrastructure. When you do, the platform calculates the real-world CO₂ offset and securely logs this action on the Algorand blockchain, instantly awarding you unchangeable, cryptographically verifiable "Green Points".
 
-## React Compiler
+## 🎯 The Problem We're Solving
+Right now, climate action suffers from two massive problems: **lack of transparency** and **lack of engagement**. 
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+People and companies claim to plant trees or reduce emissions, but how do we *prove* it? And for the everyday user, environmental dashboards are just boring spreadsheets. 
 
-## Expanding the ESLint configuration
+AeroEarth fixes both:
+1. **Gamified Action:** We turn climate awareness into an immersive 3D experience using CesiumJS.
+2. **Absolute Proof:** By storing both the starting pollution data and the user's mitigation actions (carbon offsets) on-chain, we create a transparent, tamper-proof record of who is actually helping the planet.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules::
+## ⚡ Why We Chose Algorand
+When building a global environmental platform, the blockchain itself needs to be green. We chose Algorand because:
+- **Carbon Negative & Fast:** Algorand is fundamentally built to be environmentally friendly (carbon negative) with sub-3-second finality. It makes zero sense to build an eco-saving dApp on an energy-hungry Proof-of-Work chain.
+- **Cheap Transactions:** Logging thousands of environmental data points and user actions requires micro-transaction fees. Algorand’s ~0.001 ALGO fee makes this economically viable.
+- **Box Storage (`BoxMap`):** We heavily utilize Algorand's Box Storage. It allows us to store unlimited map data and user profiles on-chain with O(1) read access, bypassing the need for a centralized database entirely.
+- **Algorand TypeScript (PuyaTs):** We wrote our smart contracts purely in TypeScript. The seamless DX of compiling familiar TS directly into AVM bytecode via AlgoKit was a game-changer for our development speed.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🔗 Live Links & Demo
+- **Live Demo URL:** [Insert Vercel/Netlify Link Here]
+- **Pitch / Demo Video:** [Insert LinkedIn Post URL Here]
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🏗 Architecture & Smart Contracts
+
+AeroEarth relies on two core smart contracts acting in harmony. Both are written in **Algorand TypeScript** (`@algorandfoundation/algorand-typescript`) and deployed via AlgoKit.
+
+### 1. The AQI Registry Contract 
+*Our decentralized oracle for live pollution data.*
+- **What it does:** Stores real-time station data (AQI, PM2.5, coordinates) sourced from hardware sensors.
+- **How it works:** Uses Algorand `BoxMap` for scalable, instant public reads. Our frontend fetches this data directly from the Algorand node—no Web2 database required.
+- **Testnet App ID:** `[Insert Testnet App ID]` *(LocalNet: 1415)*
+- **Verify on Lora Explorer:** [Insert Lora Link]
+
+### 2. The Green Rewards Contract
+*Our gamified, un-cheat-able carbon ledger.*
+- **What it does:** Whenever a user places a tree on the 3D globe, our backend verifies the coordinates and calls this contract to mint "Green Points". 
+- **How it works:** Maintains a global counter (`totalPointsIssued`) and per-user balances using a `BoxMap` (`pts:<user_address>`). Your eco-impact is fully verifiable by anyone.
+- **Testnet App ID:** `[Insert Testnet App ID]` *(LocalNet: 1395)*
+- **Verify on Lora Explorer:** [Insert Lora Link]
+
+---
+
+## 🛠 Tech Stack
+- **Blockchain:** Algorand (AVM), Algorand TypeScript, PuyaTs
+- **Developer Tooling:** AlgoKit, Lora Explorer, `@algorandfoundation/algokit-utils`
+- **Frontend Engine:** Next.js 15, React, CesiumJS (3D Globe)
+- **Styling:** TailwindCSS
+- **Backend:** Next.js API Routes (Server-side proxy for signing admin transactions)
+
+---
+
+## 💻 Installation & Local Setup
+
+Want to run AeroEarth yourself? Here’s how:
+
+### 1. Prerequisites
+- Node.js (v18+)
+- Docker Desktop (required to run the local blockchain)
+- [AlgoKit CLI](https://developer.algorand.org/docs/get-started/algokit/) 
+
+### 2. Spin up the Blockchain
+```bash
+# Start your local Algorand node
+algokit localnet start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
- 
- 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 3. Deploy the Smart Contracts
+```bash
+git clone [repo-url]
+cd [repo-directory]/blockchain
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]) 
+# Deploy the AQI Registry & seed the initial map data
+npm install
+npm run reset       
+
+# Deploy the Green Rewards ledger
+cd green-rewards
+npm install
+npm run deploy      
 ```
 
+### 4. Boot the 3D Frontend
+```bash
+cd ../air2earth-chain
+
+# Set up your environment variables
+cp .env.example .env.local 
+
+# Install and run
+npm install
+npm run dev
+```
+Open up `http://localhost:3000` and start saving the planet!
+
+---
+
+## 📸 How to Use AeroEarth
+
+### 1. Explore the 3D Pollution Heatmap
+Spin the globe to view real-time pollution data. The heatmap is rendered dynamically based entirely on data fetched live from our AQI Registry Contract.
+<div align="center">
+  <!-- TODO: Drop screenshot here -->
+  <img src="./public/screenshot-heatmap.png" alt="Heatmap Screenshot" width="800" />
+</div>
+
+### 2. Take Climate Action
+Select the "Tree" tool from the left menu and place it anywhere on the map. The panel calculates the estimated CO₂ impact of your placement.
+<div align="center">
+  <!-- TODO: Drop screenshot here -->
+  <img src="./public/screenshot-placement.png" alt="Tree Placement Screenshot" width="800" />
+</div>
+
+### 3. Earn Verifiable Green Rewards
+The moment you plant a tree, a transaction is cemented on Algorand. The live "Green Rewards" panel on your screen automatically pulls your new, tamper-proof balance directly from the chain.
+<div align="center">
+  <!-- TODO: Drop screenshot here -->
+  <img src="./public/screenshot-rewards.png" alt="Rewards Panel Screenshot" width="800" />
+</div>
+
+---
+
+## ⚠️ Known Limitations & Future Roadmap
+- **Network Dependency:** The current repo is configured for LocalNet for easy judging/testing. To run on TestNet, update the `NEXT_PUBLIC_ALGOD_SERVER` in your `.env`.
+- **Hardware Profile:** Rendering 3D maps and high-res heatmaps via Cesium is GPU-intensive. It might stutter on older laptops.
+- **Roadmap - Web3 Wallets:** Right now, the system tracks sessions and proxy addresses. Next up is native Pera Wallet / Defly integration so users hold their Green Points directly in their own wallets.
+
+---
+
+## 🤝 The Team
+- **[Your Name]** - Blockchain Architect & 3D Engineering (*[LinkedIn Profile Link]*)
+- **[Member 2 Name]** - [Role] (*[LinkedIn Profile Link]*)
+- **[Member 3 Name]** - [Role] (*[LinkedIn Profile Link]*)
