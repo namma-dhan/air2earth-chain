@@ -71,6 +71,7 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 
 1. **Gamified Climate Action:**  
    We transform climate awareness into an immersive 3D Earth experience powered by CesiumJS. Instead of static dashboards, users interact with real-world environmental data in a dynamic and intuitive way.
+   
 
 2. **On-Chain Transparency:**  
    Both the baseline pollution data and user mitigation actions are stored on-chain. This creates a transparent, tamper-proof, and publicly verifiable record of measurable climate impact.
@@ -140,25 +141,7 @@ Compiled directly into AVM bytecode via AlgoKit.
 
 ---
 
-## 🏗 Architecture & Smart Contracts
 
-AeroEarth relies on two core smart contracts acting in harmony. Both are written in **Algorand TypeScript** (`@algorandfoundation/algorand-typescript`) and deployed via AlgoKit.
-
-### 1. The AQI Registry Contract 
-*Our decentralized oracle for live pollution data.*
-- **What it does:** Stores real-time station data (AQI, PM2.5, coordinates) sourced from hardware sensors.
-- **How it works:** Uses Algorand `BoxMap` for scalable, instant public reads. Our frontend fetches this data directly from the Algorand node—no Web2 database required.
-- **Testnet App ID:** `[Insert Testnet App ID]` *(LocalNet: 1415)*
-- **Verify on Lora Explorer:** [Insert Lora Link]
-
-### 2. The Green Rewards Contract
-*Our gamified, un-cheat-able carbon ledger.*
-- **What it does:** Whenever a user places a tree on the 3D globe, our backend verifies the coordinates and calls this contract to mint "Green Points". 
-- **How it works:** Maintains a global counter (`totalPointsIssued`) and per-user balances using a `BoxMap` (`pts:<user_address>`). Your eco-impact is fully verifiable by anyone.
-- **Testnet App ID:** `[Insert Testnet App ID]` *(LocalNet: 1395)*
-- **Verify on Lora Explorer:** [Insert Lora Link]
-
----
 
 ## 🛠 Tech Stack
 - **Blockchain:** Algorand (AVM), Algorand TypeScript, PuyaTs
@@ -214,30 +197,6 @@ Open up `http://localhost:3000` and start saving the planet!
 
 ---
 
-## 📸 How to Use AeroEarth
-
-### 1. Explore the 3D Pollution Heatmap
-Spin the globe to view real-time pollution data. The heatmap is rendered dynamically based entirely on data fetched live from our AQI Registry Contract.
-<div align="center">
-  <!-- TODO: Drop screenshot here -->
-  <img src="./public/screenshot-heatmap.png" alt="Heatmap Screenshot" width="800" />
-</div>
-
-### 2. Take Climate Action
-Select the "Tree" tool from the left menu and place it anywhere on the map. The panel calculates the estimated CO₂ impact of your placement.
-<div align="center">
-  <!-- TODO: Drop screenshot here -->
-  <img src="./public/screenshot-placement.png" alt="Tree Placement Screenshot" width="800" />
-</div>
-
-### 3. Earn Verifiable Green Rewards
-The moment you plant a tree, a transaction is cemented on Algorand. The live "Green Rewards" panel on your screen automatically pulls your new, tamper-proof balance directly from the chain.
-<div align="center">
-  <!-- TODO: Drop screenshot here -->
-  <img src="./public/screenshot-rewards.png" alt="Rewards Panel Screenshot" width="800" />
-</div>
-
----
 
 ## ⚠️ Known Limitations & Future Roadmap
 - **Network Dependency:** The current repo is configured for LocalNet for easy judging/testing. To run on TestNet, update the `NEXT_PUBLIC_ALGOD_SERVER` in your `.env`.
