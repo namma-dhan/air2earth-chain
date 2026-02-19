@@ -63,11 +63,29 @@ AeroEarth fixes both:
 2. **Absolute Proof:** By storing both the starting pollution data and the user's mitigation actions (carbon offsets) on-chain, we create a transparent, tamper-proof record of who is actually helping the planet.
 
 
-<h2 align="center">How AeroEarth Fixes This</h2>
+
+<h2 align="center">
+  <img src="feature.png" alt="AeroEarth Header" width="700"/>
+</h2>
+AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
+
+
+<p align="center">
+  <img src="f1.png" width="49%" alt="Solar Dashboard"/>
+  <img src="f2.png" width="49%" alt="Water Dashboard"/>
+  <img src="f3.png" width="49%" alt="Water Dashboard"/>
+</p>
+
+<p align="center">
+  <img src="solar-feature.png" width="100%" alt="AQI Dashboard"/>
+</p>
+
+<p align="center">
+  <img src="water-feature" width="100%" alt="AQI Dashboard"/>
+</p>
 
 <br/>
 
-AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
 
 1. **Gamified Climate Action:**  
    We transform climate awareness into an immersive 3D Earth experience powered by CesiumJS. Instead of static dashboards, users interact with real-world environmental data in a dynamic and intuitive way.
@@ -82,6 +100,10 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 
 
 
+
+<p align="center">
+  <img src="algo.png" width="100%" alt="AQI Dashboard"/>
+</p>
 
 
 <h2 align="center">⚡ Why We Chose Algorand</h2>
