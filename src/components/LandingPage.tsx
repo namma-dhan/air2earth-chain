@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
@@ -158,7 +160,7 @@ const LandingPage = () => {
 
   const handleOptionClick = (route: string) => {
     setIsPopupOpen(false);
-    setTimeout(() => navigate(route), 200);
+    setTimeout(() => router.push(route), 200);
   };
   const titleText = 'AEROEARTH';
 

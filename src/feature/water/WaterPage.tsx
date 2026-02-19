@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as Cesium from 'cesium';
 import { debounce } from 'lodash';
@@ -16,7 +18,7 @@ import 'cesium/Build/Cesium/Widgets/widgets.css';
 // For many sandbox environments, we can rely on standard imports.
 (window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
 
-const CESIUM_ACCESS_TOKEN = (import.meta as any).env?.VITE_CESIUM_ACCESS_TOKEN || '';
+const CESIUM_ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
 
 const WaterPage: React.FC = () => {

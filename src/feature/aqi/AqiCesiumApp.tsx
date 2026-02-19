@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import 'normalize.css';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
@@ -15,7 +17,9 @@ import {
   type ImpactData 
 } from './utils/calculations';
 
-const ACCESS_TOKEN = import.meta.env.VITE_CESIUM_ACCESS_TOKEN;
+const ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
+// Set Cesium base URL to CDN so assets resolve correctly under webpack/Next.js
+(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
 // Station data from API - South India
@@ -441,6 +445,7 @@ function AqiCesiumApp() {
 
   useEffect(() => {
     if (!containerRef.current) return;
+    let aborted = false;
 
     const initializeCesium = async () => {
       // Create Cesium viewer with world terrain
@@ -466,6 +471,7 @@ function AqiCesiumApp() {
       let osmBuildingsTileset: Cesium.Cesium3DTileset | null = null;
       try {
         osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+        if (aborted || viewer.isDestroyed()) return;
         viewer.scene.primitives.add(osmBuildingsTileset);
 
         // Build dynamic style conditions based on station data
@@ -582,6 +588,7 @@ function AqiCesiumApp() {
             bounds.north
           ),
         });
+        if (aborted || viewer.isDestroyed()) return;
 
         heatmapLayer = viewer.imageryLayers.addImageryProvider(heatmapProvider);
         heatmapLayer.alpha = 0.5; // Initial opacity
@@ -595,6 +602,7 @@ function AqiCesiumApp() {
       let lastBuildingStyleState = true; // Track if AQI colors are shown
 
       const updateHeatmapVisibility = () => {
+        if (viewer.isDestroyed()) return;
         const cameraHeight = viewer.camera.positionCartographic.height;
 
         // Define height thresholds for heatmap visibility
@@ -764,10 +772,11 @@ function AqiCesiumApp() {
 
     // Cleanup function
     return () => {
-      if (viewerRef.current) {
+      aborted = true;
+      if (viewerRef.current && !viewerRef.current.isDestroyed()) {
         viewerRef.current.destroy();
-        viewerRef.current = null;
       }
+      viewerRef.current = null;
     };
   }, []);
 
