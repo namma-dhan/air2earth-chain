@@ -23,28 +23,29 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { e } from "./chunk-4TAASUQ2.js";
+import { e } from './chunk-4TAASUQ2.js';
+
 function t(r) {
-	(this.name = "RuntimeError"), (this.message = r);
-	let o;
-	try {
-		throw new Error();
-	} catch (s) {
-		o = s.stack;
-	}
-	this.stack = o;
+  (this.name = 'RuntimeError'), (this.message = r);
+  let o;
+  try {
+    throw new Error();
+  } catch (s) {
+    o = s.stack;
+  }
+  this.stack = o;
 }
 e(Object.create) &&
-	((t.prototype = Object.create(Error.prototype)),
-	(t.prototype.constructor = t));
+  ((t.prototype = Object.create(Error.prototype)),
+  (t.prototype.constructor = t));
 t.prototype.toString = function () {
-	let r = `${this.name}: ${this.message}`;
-	return (
-		e(this.stack) &&
-			(r += `
+  let r = `${this.name}: ${this.message}`;
+  return (
+    e(this.stack) &&
+      (r += `
 ${this.stack.toString()}`),
-		r
-	);
+    r
+  );
 };
 var c = t;
 export { c as a };

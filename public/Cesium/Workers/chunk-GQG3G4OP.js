@@ -24,5 +24,5 @@
  */
 
 var e = { OUTSIDE: -1, INTERSECTING: 0, INSIDE: 1 },
-	t = Object.freeze(e);
+  t = Object.freeze(e);
 export { t as a };

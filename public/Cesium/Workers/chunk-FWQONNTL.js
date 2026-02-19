@@ -22,78 +22,78 @@
  * Portions licensed separately.
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-import { a as s } from "./chunk-3XRQCEHV.js";
-import { e as m } from "./chunk-4TAASUQ2.js";
-import { a as t } from "./chunk-TODZU3UG.js";
-import { b as d, a as l } from "./chunk-V62DYOIH.js";
-import { a as f, b as r } from "./chunk-VIWNLE3Z.js";
+import { a as s } from './chunk-3XRQCEHV.js';
+import { e as m } from './chunk-4TAASUQ2.js';
+import { a as t } from './chunk-TODZU3UG.js';
+import { b as d, a as l } from './chunk-V62DYOIH.js';
+import { a as f, b as r } from './chunk-VIWNLE3Z.js';
 
 function o(e, n) {
-	if (
-		(r.typeOf.object("normal", e),
-		!s.equalsEpsilon(t.magnitude(e), 1, s.EPSILON6))
-	)
-		throw new f("normal must be normalized.");
-	r.typeOf.number("distance", n),
-		(this.normal = t.clone(e)),
-		(this.distance = n);
+  if (
+    (r.typeOf.object('normal', e),
+    !s.equalsEpsilon(t.magnitude(e), 1, s.EPSILON6))
+  )
+    throw new f('normal must be normalized.');
+  r.typeOf.number('distance', n),
+    (this.normal = t.clone(e)),
+    (this.distance = n);
 }
 o.fromPointNormal = (e, n, a) => {
-	if (
-		(r.typeOf.object("point", e),
-		r.typeOf.object("normal", n),
-		!s.equalsEpsilon(t.magnitude(n), 1, s.EPSILON6))
-	)
-		throw new f("normal must be normalized.");
-	const c = -t.dot(n, e);
-	return m(a) ? (t.clone(n, a.normal), (a.distance = c), a) : new o(n, c);
+  if (
+    (r.typeOf.object('point', e),
+    r.typeOf.object('normal', n),
+    !s.equalsEpsilon(t.magnitude(n), 1, s.EPSILON6))
+  )
+    throw new f('normal must be normalized.');
+  const c = -t.dot(n, e);
+  return m(a) ? (t.clone(n, a.normal), (a.distance = c), a) : new o(n, c);
 };
 var b = new t();
 o.fromCartesian4 = (e, n) => {
-	r.typeOf.object("coefficients", e);
-	const a = t.fromCartesian4(e, b),
-		c = e.w;
-	if (!s.equalsEpsilon(t.magnitude(a), 1, s.EPSILON6))
-		throw new f("normal must be normalized.");
-	return m(n) ? (t.clone(a, n.normal), (n.distance = c), n) : new o(a, c);
+  r.typeOf.object('coefficients', e);
+  const a = t.fromCartesian4(e, b),
+    c = e.w;
+  if (!s.equalsEpsilon(t.magnitude(a), 1, s.EPSILON6))
+    throw new f('normal must be normalized.');
+  return m(n) ? (t.clone(a, n.normal), (n.distance = c), n) : new o(a, c);
 };
 o.getPointDistance = (e, n) => (
-	r.typeOf.object("plane", e),
-	r.typeOf.object("point", n),
-	t.dot(e.normal, n) + e.distance
+  r.typeOf.object('plane', e),
+  r.typeOf.object('point', n),
+  t.dot(e.normal, n) + e.distance
 );
 var y = new t();
 o.projectPointOntoPlane = (e, n, a) => {
-	r.typeOf.object("plane", e),
-		r.typeOf.object("point", n),
-		m(a) || (a = new t());
-	const c = o.getPointDistance(e, n),
-		p = t.multiplyByScalar(e.normal, c, y);
-	return t.subtract(n, p, a);
+  r.typeOf.object('plane', e),
+    r.typeOf.object('point', n),
+    m(a) || (a = new t());
+  const c = o.getPointDistance(e, n),
+    p = t.multiplyByScalar(e.normal, c, y);
+  return t.subtract(n, p, a);
 };
 var w = new d(),
-	j = new l(),
-	N = new t();
+  j = new l(),
+  N = new t();
 o.transform = (e, n, a) => {
-	r.typeOf.object("plane", e), r.typeOf.object("transform", n);
-	let c = e.normal,
-		p = e.distance,
-		u = d.inverseTranspose(n, w),
-		i = l.fromElements(c.x, c.y, c.z, p, j);
-	i = d.multiplyByVector(u, i, i);
-	const O = t.fromCartesian4(i, N);
-	return (i = l.divideByScalar(i, t.magnitude(O), i)), o.fromCartesian4(i, a);
+  r.typeOf.object('plane', e), r.typeOf.object('transform', n);
+  let c = e.normal,
+    p = e.distance,
+    u = d.inverseTranspose(n, w),
+    i = l.fromElements(c.x, c.y, c.z, p, j);
+  i = d.multiplyByVector(u, i, i);
+  const O = t.fromCartesian4(i, N);
+  return (i = l.divideByScalar(i, t.magnitude(O), i)), o.fromCartesian4(i, a);
 };
 o.clone = (e, n) => (
-	r.typeOf.object("plane", e),
-	m(n)
-		? (t.clone(e.normal, n.normal), (n.distance = e.distance), n)
-		: new o(e.normal, e.distance)
+  r.typeOf.object('plane', e),
+  m(n)
+    ? (t.clone(e.normal, n.normal), (n.distance = e.distance), n)
+    : new o(e.normal, e.distance)
 );
 o.equals = (e, n) => (
-	r.typeOf.object("left", e),
-	r.typeOf.object("right", n),
-	e.distance === n.distance && t.equals(e.normal, n.normal)
+  r.typeOf.object('left', e),
+  r.typeOf.object('right', n),
+  e.distance === n.distance && t.equals(e.normal, n.normal)
 );
 o.ORIGIN_XY_PLANE = Object.freeze(new o(t.UNIT_Z, 0));
 o.ORIGIN_YZ_PLANE = Object.freeze(new o(t.UNIT_X, 0));

@@ -23,4 +23,32 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import{a as i}from"./chunk-XUZLSSMZ.js";import"./chunk-DZRNINSJ.js";import"./chunk-H7AFCEEW.js";import"./chunk-Z7UZ2XGJ.js";import"./chunk-UA3N5FHD.js";import"./chunk-LN5LAAB6.js";import"./chunk-OXROQHTA.js";import"./chunk-GQG3G4OP.js";import"./chunk-4JSGO3Z7.js";import"./chunk-V62DYOIH.js";import"./chunk-54IT5KT4.js";import"./chunk-E6GK7MVP.js";import"./chunk-YQTAAITT.js";import{c}from"./chunk-WV2SHQ7E.js";import{a as t}from"./chunk-TODZU3UG.js";import"./chunk-3XRQCEHV.js";import"./chunk-VIWNLE3Z.js";import{e as o}from"./chunk-4TAASUQ2.js";function a(r,n){return o(n)&&(r=i.unpack(r,n)),r._center=t.clone(r._center),r._ellipsoid=c.clone(r._ellipsoid),i.createGeometry(r)}var p=a;export{p as default};
+import { a as i } from './chunk-XUZLSSMZ.js';
+import './chunk-DZRNINSJ.js';
+import './chunk-H7AFCEEW.js';
+import './chunk-Z7UZ2XGJ.js';
+import './chunk-UA3N5FHD.js';
+import './chunk-LN5LAAB6.js';
+import './chunk-OXROQHTA.js';
+import './chunk-GQG3G4OP.js';
+import './chunk-4JSGO3Z7.js';
+import './chunk-V62DYOIH.js';
+import './chunk-54IT5KT4.js';
+import './chunk-E6GK7MVP.js';
+import './chunk-YQTAAITT.js';
+import { a as t } from './chunk-TODZU3UG.js';
+import { c } from './chunk-WV2SHQ7E.js';
+import './chunk-3XRQCEHV.js';
+import './chunk-VIWNLE3Z.js';
+import { e as o } from './chunk-4TAASUQ2.js';
+
+function a(r, n) {
+  return (
+    o(n) && (r = i.unpack(r, n)),
+    (r._center = t.clone(r._center)),
+    (r._ellipsoid = c.clone(r._ellipsoid)),
+    i.createGeometry(r)
+  );
+}
+var p = a;
+export { p as default };

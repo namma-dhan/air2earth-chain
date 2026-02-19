@@ -23,64 +23,64 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { a as h } from "./chunk-5K4QFLQS.js";
-import { b as a, a as n } from "./chunk-TODZU3UG.js";
-import { b as f } from "./chunk-VIWNLE3Z.js";
-import { b as y } from "./chunk-WV2SHQ7E.js";
+import { a as h } from './chunk-5K4QFLQS.js';
+import { b as a, a as n } from './chunk-TODZU3UG.js';
+import { b as f } from './chunk-VIWNLE3Z.js';
+import { b as y } from './chunk-WV2SHQ7E.js';
 
 var x = {},
-	b = new n(),
-	P = new n(),
-	B = new n(),
-	M = new n(),
-	w = new h();
+  b = new n(),
+  P = new n(),
+  B = new n(),
+  M = new n(),
+  w = new h();
 x.validOutline = (i) => {
-	f.defined("positions", i);
-	const o = h.fromPoints(i, w).halfAxes,
-		e = a.getColumn(o, 0, P),
-		r = a.getColumn(o, 1, B),
-		t = a.getColumn(o, 2, M),
-		u = n.magnitude(e),
-		s = n.magnitude(r),
-		l = n.magnitude(t);
-	return !((u === 0 && (s === 0 || l === 0)) || (s === 0 && l === 0));
+  f.defined('positions', i);
+  const o = h.fromPoints(i, w).halfAxes,
+    e = a.getColumn(o, 0, P),
+    r = a.getColumn(o, 1, B),
+    t = a.getColumn(o, 2, M),
+    u = n.magnitude(e),
+    s = n.magnitude(r),
+    l = n.magnitude(t);
+  return !((u === 0 && (s === 0 || l === 0)) || (s === 0 && l === 0));
 };
 x.computeProjectTo2DArguments = (i, c, o, e) => {
-	f.defined("positions", i),
-		f.defined("centerResult", c),
-		f.defined("planeAxis1Result", o),
-		f.defined("planeAxis2Result", e);
-	const r = h.fromPoints(i, w),
-		t = r.halfAxes,
-		u = a.getColumn(t, 0, P),
-		s = a.getColumn(t, 1, B),
-		l = a.getColumn(t, 2, M),
-		A = n.magnitude(u),
-		d = n.magnitude(s),
-		g = n.magnitude(l),
-		m = Math.min(A, d, g);
-	if ((A === 0 && (d === 0 || g === 0)) || (d === 0 && g === 0)) return !1;
-	let p, C;
-	return (
-		(m === d || m === g) && (p = u),
-		m === A ? (p = s) : m === g && (C = s),
-		(m === A || m === d) && (C = l),
-		n.normalize(p, o),
-		n.normalize(C, e),
-		n.clone(r.center, c),
-		!0
-	);
+  f.defined('positions', i),
+    f.defined('centerResult', c),
+    f.defined('planeAxis1Result', o),
+    f.defined('planeAxis2Result', e);
+  const r = h.fromPoints(i, w),
+    t = r.halfAxes,
+    u = a.getColumn(t, 0, P),
+    s = a.getColumn(t, 1, B),
+    l = a.getColumn(t, 2, M),
+    A = n.magnitude(u),
+    d = n.magnitude(s),
+    g = n.magnitude(l),
+    m = Math.min(A, d, g);
+  if ((A === 0 && (d === 0 || g === 0)) || (d === 0 && g === 0)) return !1;
+  let p, C;
+  return (
+    (m === d || m === g) && (p = u),
+    m === A ? (p = s) : m === g && (C = s),
+    (m === A || m === d) && (C = l),
+    n.normalize(p, o),
+    n.normalize(C, e),
+    n.clone(r.center, c),
+    !0
+  );
 };
 function z(i, c, o, e, r) {
-	const t = n.subtract(i, c, b),
-		u = n.dot(o, t),
-		s = n.dot(e, t);
-	return y.fromElements(u, s, r);
+  const t = n.subtract(i, c, b),
+    u = n.dot(o, t),
+    s = n.dot(e, t);
+  return y.fromElements(u, s, r);
 }
 x.createProjectPointsTo2DFunction = (i, c, o) => (e) => {
-	const r = new Array(e.length);
-	for (let t = 0; t < e.length; t++) r[t] = z(e[t], i, c, o);
-	return r;
+  const r = new Array(e.length);
+  for (let t = 0; t < e.length; t++) r[t] = z(e[t], i, c, o);
+  return r;
 };
 x.createProjectPointTo2DFunction = (i, c, o) => (e, r) => z(e, i, c, o, r);
 var O = x;

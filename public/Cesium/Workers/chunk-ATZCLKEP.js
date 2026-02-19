@@ -22,50 +22,50 @@
  * Portions licensed separately.
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-import { a as d } from "./chunk-3XRQCEHV.js";
-import { e as a } from "./chunk-4TAASUQ2.js";
-import { a as u } from "./chunk-TODZU3UG.js";
-import { a as s } from "./chunk-VIWNLE3Z.js";
-import { a as c, c as p } from "./chunk-WV2SHQ7E.js";
+import { a as d } from './chunk-3XRQCEHV.js';
+import { e as a } from './chunk-4TAASUQ2.js';
+import { a as u } from './chunk-TODZU3UG.js';
+import { a as s } from './chunk-VIWNLE3Z.js';
+import { a as c, c as p } from './chunk-WV2SHQ7E.js';
 
 function e(t) {
-	(this._ellipsoid = t ?? p.WGS84),
-		(this._semimajorAxis = this._ellipsoid.maximumRadius),
-		(this._oneOverSemimajorAxis = 1 / this._semimajorAxis);
+  (this._ellipsoid = t ?? p.WGS84),
+    (this._semimajorAxis = this._ellipsoid.maximumRadius),
+    (this._oneOverSemimajorAxis = 1 / this._semimajorAxis);
 }
 Object.defineProperties(e.prototype, {
-	ellipsoid: {
-		get: function () {
-			return this._ellipsoid;
-		},
-	},
+  ellipsoid: {
+    get: function () {
+      return this._ellipsoid;
+    },
+  },
 });
 e.mercatorAngleToGeodeticLatitude = (t) =>
-	d.PI_OVER_TWO - 2 * Math.atan(Math.exp(-t));
+  d.PI_OVER_TWO - 2 * Math.atan(Math.exp(-t));
 e.geodeticLatitudeToMercatorAngle = (t) => {
-	t > e.MaximumLatitude
-		? (t = e.MaximumLatitude)
-		: t < -e.MaximumLatitude && (t = -e.MaximumLatitude);
-	const i = Math.sin(t);
-	return 0.5 * Math.log((1 + i) / (1 - i));
+  t > e.MaximumLatitude
+    ? (t = e.MaximumLatitude)
+    : t < -e.MaximumLatitude && (t = -e.MaximumLatitude);
+  const i = Math.sin(t);
+  return 0.5 * Math.log((1 + i) / (1 - i));
 };
 e.MaximumLatitude = e.mercatorAngleToGeodeticLatitude(Math.PI);
 e.prototype.project = function (t, i) {
-	const o = this._semimajorAxis,
-		r = t.longitude * o,
-		n = e.geodeticLatitudeToMercatorAngle(t.latitude) * o,
-		m = t.height;
-	return a(i) ? ((i.x = r), (i.y = n), (i.z = m), i) : new u(r, n, m);
+  const o = this._semimajorAxis,
+    r = t.longitude * o,
+    n = e.geodeticLatitudeToMercatorAngle(t.latitude) * o,
+    m = t.height;
+  return a(i) ? ((i.x = r), (i.y = n), (i.z = m), i) : new u(r, n, m);
 };
 e.prototype.unproject = function (t, i) {
-	if (!a(t)) throw new s("cartesian is required");
-	const o = this._oneOverSemimajorAxis,
-		r = t.x * o,
-		n = e.mercatorAngleToGeodeticLatitude(t.y * o),
-		m = t.z;
-	return a(i)
-		? ((i.longitude = r), (i.latitude = n), (i.height = m), i)
-		: new c(r, n, m);
+  if (!a(t)) throw new s('cartesian is required');
+  const o = this._oneOverSemimajorAxis,
+    r = t.x * o,
+    n = e.mercatorAngleToGeodeticLatitude(t.y * o),
+    m = t.z;
+  return a(i)
+    ? ((i.longitude = r), (i.latitude = n), (i.height = m), i)
+    : new c(r, n, m);
 };
 var A = e;
 export { A as a };

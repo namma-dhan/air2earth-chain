@@ -24,11 +24,11 @@
  */
 
 self.onmessage = (a) => {
-	const s = a.data.array,
-		e = self.webkitPostMessage || self.postMessage;
-	try {
-		e({ array: s }, [s.buffer]);
-	} catch {
-		e({});
-	}
+  const s = a.data.array,
+    e = self.webkitPostMessage || self.postMessage;
+  try {
+    e({ array: s }, [s.buffer]);
+  } catch {
+    e({});
+  }
 };

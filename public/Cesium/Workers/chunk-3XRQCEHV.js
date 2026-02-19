@@ -22,116 +22,116 @@
  * Portions licensed separately.
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-import { c as E, d as I, e as o } from "./chunk-4TAASUQ2.js";
-import { b as a, a as n } from "./chunk-VIWNLE3Z.js";
+import { c as E, d as I, e as o } from './chunk-4TAASUQ2.js';
+import { b as a, a as n } from './chunk-VIWNLE3Z.js';
 
 var d = E((_, m) => {
-	var f = function (t) {
-		t == null && (t = new Date().getTime()),
-			(this.N = 624),
-			(this.M = 397),
-			(this.MATRIX_A = 2567483615),
-			(this.UPPER_MASK = 2147483648),
-			(this.LOWER_MASK = 2147483647),
-			(this.mt = new Array(this.N)),
-			(this.mti = this.N + 1),
-			t.constructor == Array
-				? this.init_by_array(t, t.length)
-				: this.init_seed(t);
-	};
-	f.prototype.init_seed = function (t) {
-		for (this.mt[0] = t >>> 0, this.mti = 1; this.mti < this.N; this.mti++) {
-			var t = this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30);
-			(this.mt[this.mti] =
-				((((t & 4294901760) >>> 16) * 1812433253) << 16) +
-				(t & 65535) * 1812433253 +
-				this.mti),
-				(this.mt[this.mti] >>>= 0);
-		}
-	};
-	f.prototype.init_by_array = function (t, i) {
-		var e, s, h;
-		for (
-			this.init_seed(19650218), e = 1, s = 0, h = this.N > i ? this.N : i;
-			h;
-			h--
-		) {
-			var u = this.mt[e - 1] ^ (this.mt[e - 1] >>> 30);
-			(this.mt[e] =
-				(this.mt[e] ^
-					(((((u & 4294901760) >>> 16) * 1664525) << 16) +
-						(u & 65535) * 1664525)) +
-				t[s] +
-				s),
-				(this.mt[e] >>>= 0),
-				e++,
-				s++,
-				e >= this.N && ((this.mt[0] = this.mt[this.N - 1]), (e = 1)),
-				s >= i && (s = 0);
-		}
-		for (h = this.N - 1; h; h--) {
-			var u = this.mt[e - 1] ^ (this.mt[e - 1] >>> 30);
-			(this.mt[e] =
-				(this.mt[e] ^
-					(((((u & 4294901760) >>> 16) * 1566083941) << 16) +
-						(u & 65535) * 1566083941)) -
-				e),
-				(this.mt[e] >>>= 0),
-				e++,
-				e >= this.N && ((this.mt[0] = this.mt[this.N - 1]), (e = 1));
-		}
-		this.mt[0] = 2147483648;
-	};
-	f.prototype.random_int = function () {
-		var t,
-			i = [0, this.MATRIX_A];
-		if (this.mti >= this.N) {
-			var e;
-			for (
-				this.mti == this.N + 1 && this.init_seed(5489), e = 0;
-				e < this.N - this.M;
-				e++
-			)
-				(t =
-					(this.mt[e] & this.UPPER_MASK) | (this.mt[e + 1] & this.LOWER_MASK)),
-					(this.mt[e] = this.mt[e + this.M] ^ (t >>> 1) ^ i[t & 1]);
-			for (; e < this.N - 1; e++)
-				(t =
-					(this.mt[e] & this.UPPER_MASK) | (this.mt[e + 1] & this.LOWER_MASK)),
-					(this.mt[e] = this.mt[e + (this.M - this.N)] ^ (t >>> 1) ^ i[t & 1]);
-			(t =
-				(this.mt[this.N - 1] & this.UPPER_MASK) |
-				(this.mt[0] & this.LOWER_MASK)),
-				(this.mt[this.N - 1] = this.mt[this.M - 1] ^ (t >>> 1) ^ i[t & 1]),
-				(this.mti = 0);
-		}
-		return (
-			(t = this.mt[this.mti++]),
-			(t ^= t >>> 11),
-			(t ^= (t << 7) & 2636928640),
-			(t ^= (t << 15) & 4022730752),
-			(t ^= t >>> 18),
-			t >>> 0
-		);
-	};
-	f.prototype.random_int31 = function () {
-		return this.random_int() >>> 1;
-	};
-	f.prototype.random_incl = function () {
-		return this.random_int() * (1 / 4294967295);
-	};
-	f.prototype.random = function () {
-		return this.random_int() * (1 / 4294967296);
-	};
-	f.prototype.random_excl = function () {
-		return (this.random_int() + 0.5) * (1 / 4294967296);
-	};
-	f.prototype.random_long = function () {
-		var t = this.random_int() >>> 5,
-			i = this.random_int() >>> 6;
-		return (t * 67108864 + i) * (1 / 9007199254740992);
-	};
-	m.exports = f;
+  var f = function (t) {
+    t == null && (t = new Date().getTime()),
+      (this.N = 624),
+      (this.M = 397),
+      (this.MATRIX_A = 2567483615),
+      (this.UPPER_MASK = 2147483648),
+      (this.LOWER_MASK = 2147483647),
+      (this.mt = new Array(this.N)),
+      (this.mti = this.N + 1),
+      t.constructor == Array
+        ? this.init_by_array(t, t.length)
+        : this.init_seed(t);
+  };
+  f.prototype.init_seed = function (t) {
+    for (this.mt[0] = t >>> 0, this.mti = 1; this.mti < this.N; this.mti++) {
+      var t = this.mt[this.mti - 1] ^ (this.mt[this.mti - 1] >>> 30);
+      (this.mt[this.mti] =
+        ((((t & 4294901760) >>> 16) * 1812433253) << 16) +
+        (t & 65535) * 1812433253 +
+        this.mti),
+        (this.mt[this.mti] >>>= 0);
+    }
+  };
+  f.prototype.init_by_array = function (t, i) {
+    var e, s, h;
+    for (
+      this.init_seed(19650218), e = 1, s = 0, h = this.N > i ? this.N : i;
+      h;
+      h--
+    ) {
+      var u = this.mt[e - 1] ^ (this.mt[e - 1] >>> 30);
+      (this.mt[e] =
+        (this.mt[e] ^
+          (((((u & 4294901760) >>> 16) * 1664525) << 16) +
+            (u & 65535) * 1664525)) +
+        t[s] +
+        s),
+        (this.mt[e] >>>= 0),
+        e++,
+        s++,
+        e >= this.N && ((this.mt[0] = this.mt[this.N - 1]), (e = 1)),
+        s >= i && (s = 0);
+    }
+    for (h = this.N - 1; h; h--) {
+      var u = this.mt[e - 1] ^ (this.mt[e - 1] >>> 30);
+      (this.mt[e] =
+        (this.mt[e] ^
+          (((((u & 4294901760) >>> 16) * 1566083941) << 16) +
+            (u & 65535) * 1566083941)) -
+        e),
+        (this.mt[e] >>>= 0),
+        e++,
+        e >= this.N && ((this.mt[0] = this.mt[this.N - 1]), (e = 1));
+    }
+    this.mt[0] = 2147483648;
+  };
+  f.prototype.random_int = function () {
+    var t,
+      i = [0, this.MATRIX_A];
+    if (this.mti >= this.N) {
+      var e;
+      for (
+        this.mti == this.N + 1 && this.init_seed(5489), e = 0;
+        e < this.N - this.M;
+        e++
+      )
+        (t =
+          (this.mt[e] & this.UPPER_MASK) | (this.mt[e + 1] & this.LOWER_MASK)),
+          (this.mt[e] = this.mt[e + this.M] ^ (t >>> 1) ^ i[t & 1]);
+      for (; e < this.N - 1; e++)
+        (t =
+          (this.mt[e] & this.UPPER_MASK) | (this.mt[e + 1] & this.LOWER_MASK)),
+          (this.mt[e] = this.mt[e + (this.M - this.N)] ^ (t >>> 1) ^ i[t & 1]);
+      (t =
+        (this.mt[this.N - 1] & this.UPPER_MASK) |
+        (this.mt[0] & this.LOWER_MASK)),
+        (this.mt[this.N - 1] = this.mt[this.M - 1] ^ (t >>> 1) ^ i[t & 1]),
+        (this.mti = 0);
+    }
+    return (
+      (t = this.mt[this.mti++]),
+      (t ^= t >>> 11),
+      (t ^= (t << 7) & 2636928640),
+      (t ^= (t << 15) & 4022730752),
+      (t ^= t >>> 18),
+      t >>> 0
+    );
+  };
+  f.prototype.random_int31 = function () {
+    return this.random_int() >>> 1;
+  };
+  f.prototype.random_incl = function () {
+    return this.random_int() * (1 / 4294967295);
+  };
+  f.prototype.random = function () {
+    return this.random_int() * (1 / 4294967296);
+  };
+  f.prototype.random_excl = function () {
+    return (this.random_int() + 0.5) * (1 / 4294967296);
+  };
+  f.prototype.random_long = function () {
+    var t = this.random_int() >>> 5,
+      i = this.random_int() >>> 6;
+    return (t * 67108864 + i) * (1 / 9007199254740992);
+  };
+  m.exports = f;
 });
 var w = I(d(), 1);
 var r = {};
@@ -162,14 +162,14 @@ r.LUNAR_RADIUS = 1737400;
 r.SIXTY_FOUR_KILOBYTES = 64 * 1024;
 r.FOUR_GIGABYTES = 4 * 1024 * 1024 * 1024;
 r.sign =
-	Math.sign ?? ((i) => ((i = +i), i === 0 || i !== i ? i : i > 0 ? 1 : -1));
+  Math.sign ?? ((i) => ((i = +i), i === 0 || i !== i ? i : i > 0 ? 1 : -1));
 r.signNotZero = (t) => (t < 0 ? -1 : 1);
 r.toSNorm = (t, i) => (
-	(i = i ?? 255), Math.round((r.clamp(t, -1, 1) * 0.5 + 0.5) * i)
+  (i = i ?? 255), Math.round((r.clamp(t, -1, 1) * 0.5 + 0.5) * i)
 );
 r.fromSNorm = (t, i) => ((i = i ?? 255), (r.clamp(t, 0, i) / i) * 2 - 1);
 r.normalize = (t, i, e) => (
-	(e = Math.max(e - i, 0)), e === 0 ? 0 : r.clamp((t - i) / e, 0, 1)
+  (e = Math.max(e - i, 0)), e === 0 ? 0 : r.clamp((t - i) / e, 0, 1)
 );
 r.sinh = Math.sinh ?? ((i) => (Math.exp(i) - Math.exp(-i)) / 2);
 r.cosh = Math.cosh ?? ((i) => (Math.exp(i) + Math.exp(-i)) / 2);
@@ -187,185 +187,185 @@ r.RADIANS_PER_DEGREE = Math.PI / 180;
 r.DEGREES_PER_RADIAN = 180 / Math.PI;
 r.RADIANS_PER_ARCSECOND = r.RADIANS_PER_DEGREE / 3600;
 r.toRadians = (t) => {
-	if (!o(t)) throw new n("degrees is required.");
-	return t * r.RADIANS_PER_DEGREE;
+  if (!o(t)) throw new n('degrees is required.');
+  return t * r.RADIANS_PER_DEGREE;
 };
 r.toDegrees = (t) => {
-	if (!o(t)) throw new n("radians is required.");
-	return t * r.DEGREES_PER_RADIAN;
+  if (!o(t)) throw new n('radians is required.');
+  return t * r.DEGREES_PER_RADIAN;
 };
 r.convertLongitudeRange = (t) => {
-	if (!o(t)) throw new n("angle is required.");
-	const i = r.TWO_PI,
-		e = t - Math.floor(t / i) * i;
-	return e < -Math.PI ? e + i : e >= Math.PI ? e - i : e;
+  if (!o(t)) throw new n('angle is required.');
+  const i = r.TWO_PI,
+    e = t - Math.floor(t / i) * i;
+  return e < -Math.PI ? e + i : e >= Math.PI ? e - i : e;
 };
 r.clampToLatitudeRange = (t) => {
-	if (!o(t)) throw new n("angle is required.");
-	return r.clamp(t, -1 * r.PI_OVER_TWO, r.PI_OVER_TWO);
+  if (!o(t)) throw new n('angle is required.');
+  return r.clamp(t, -1 * r.PI_OVER_TWO, r.PI_OVER_TWO);
 };
 r.negativePiToPi = (t) => {
-	if (!o(t)) throw new n("angle is required.");
-	return t >= -r.PI && t <= r.PI ? t : r.zeroToTwoPi(t + r.PI) - r.PI;
+  if (!o(t)) throw new n('angle is required.');
+  return t >= -r.PI && t <= r.PI ? t : r.zeroToTwoPi(t + r.PI) - r.PI;
 };
 r.zeroToTwoPi = (t) => {
-	if (!o(t)) throw new n("angle is required.");
-	if (t >= 0 && t <= r.TWO_PI) return t;
-	const i = r.mod(t, r.TWO_PI);
-	return Math.abs(i) < r.EPSILON14 && Math.abs(t) > r.EPSILON14 ? r.TWO_PI : i;
+  if (!o(t)) throw new n('angle is required.');
+  if (t >= 0 && t <= r.TWO_PI) return t;
+  const i = r.mod(t, r.TWO_PI);
+  return Math.abs(i) < r.EPSILON14 && Math.abs(t) > r.EPSILON14 ? r.TWO_PI : i;
 };
 r.mod = (t, i) => {
-	if (!o(t)) throw new n("m is required.");
-	if (!o(i)) throw new n("n is required.");
-	if (i === 0) throw new n("divisor cannot be 0.");
-	return r.sign(t) === r.sign(i) && Math.abs(t) < Math.abs(i)
-		? t
-		: ((t % i) + i) % i;
+  if (!o(t)) throw new n('m is required.');
+  if (!o(i)) throw new n('n is required.');
+  if (i === 0) throw new n('divisor cannot be 0.');
+  return r.sign(t) === r.sign(i) && Math.abs(t) < Math.abs(i)
+    ? t
+    : ((t % i) + i) % i;
 };
 r.equalsEpsilon = (t, i, e, s) => {
-	if (!o(t)) throw new n("left is required.");
-	if (!o(i)) throw new n("right is required.");
-	(e = e ?? 0), (s = s ?? e);
-	const h = Math.abs(t - i);
-	return h <= s || h <= e * Math.max(Math.abs(t), Math.abs(i));
+  if (!o(t)) throw new n('left is required.');
+  if (!o(i)) throw new n('right is required.');
+  (e = e ?? 0), (s = s ?? e);
+  const h = Math.abs(t - i);
+  return h <= s || h <= e * Math.max(Math.abs(t), Math.abs(i));
 };
 r.lessThan = (t, i, e) => {
-	if (!o(t)) throw new n("first is required.");
-	if (!o(i)) throw new n("second is required.");
-	if (!o(e)) throw new n("absoluteEpsilon is required.");
-	return t - i < -e;
+  if (!o(t)) throw new n('first is required.');
+  if (!o(i)) throw new n('second is required.');
+  if (!o(e)) throw new n('absoluteEpsilon is required.');
+  return t - i < -e;
 };
 r.lessThanOrEquals = (t, i, e) => {
-	if (!o(t)) throw new n("first is required.");
-	if (!o(i)) throw new n("second is required.");
-	if (!o(e)) throw new n("absoluteEpsilon is required.");
-	return t - i < e;
+  if (!o(t)) throw new n('first is required.');
+  if (!o(i)) throw new n('second is required.');
+  if (!o(e)) throw new n('absoluteEpsilon is required.');
+  return t - i < e;
 };
 r.greaterThan = (t, i, e) => {
-	if (!o(t)) throw new n("first is required.");
-	if (!o(i)) throw new n("second is required.");
-	if (!o(e)) throw new n("absoluteEpsilon is required.");
-	return t - i > e;
+  if (!o(t)) throw new n('first is required.');
+  if (!o(i)) throw new n('second is required.');
+  if (!o(e)) throw new n('absoluteEpsilon is required.');
+  return t - i > e;
 };
 r.greaterThanOrEquals = (t, i, e) => {
-	if (!o(t)) throw new n("first is required.");
-	if (!o(i)) throw new n("second is required.");
-	if (!o(e)) throw new n("absoluteEpsilon is required.");
-	return t - i > -e;
+  if (!o(t)) throw new n('first is required.');
+  if (!o(i)) throw new n('second is required.');
+  if (!o(e)) throw new n('absoluteEpsilon is required.');
+  return t - i > -e;
 };
 var c = [1];
 r.factorial = (t) => {
-	if (typeof t != "number" || t < 0)
-		throw new n("A number greater than or equal to 0 is required.");
-	const i = c.length;
-	if (t >= i) {
-		let e = c[i - 1];
-		for (let s = i; s <= t; s++) {
-			const h = e * s;
-			c.push(h), (e = h);
-		}
-	}
-	return c[t];
+  if (typeof t != 'number' || t < 0)
+    throw new n('A number greater than or equal to 0 is required.');
+  const i = c.length;
+  if (t >= i) {
+    let e = c[i - 1];
+    for (let s = i; s <= t; s++) {
+      const h = e * s;
+      c.push(h), (e = h);
+    }
+  }
+  return c[t];
 };
 r.incrementWrap = (t, i, e) => {
-	if (((e = e ?? 0), !o(t))) throw new n("n is required.");
-	if (i <= e) throw new n("maximumValue must be greater than minimumValue.");
-	return ++t, t > i && (t = e), t;
+  if (((e = e ?? 0), !o(t))) throw new n('n is required.');
+  if (i <= e) throw new n('maximumValue must be greater than minimumValue.');
+  return ++t, t > i && (t = e), t;
 };
 r.isPowerOfTwo = (t) => {
-	if (typeof t != "number" || t < 0 || t > 4294967295)
-		throw new n("A number between 0 and (2^32)-1 is required.");
-	return t !== 0 && (t & (t - 1)) === 0;
+  if (typeof t != 'number' || t < 0 || t > 4294967295)
+    throw new n('A number between 0 and (2^32)-1 is required.');
+  return t !== 0 && (t & (t - 1)) === 0;
 };
 r.nextPowerOfTwo = (t) => {
-	if (typeof t != "number" || t < 0 || t > 2147483648)
-		throw new n("A number between 0 and 2^31 is required.");
-	return (
-		--t,
-		(t |= t >> 1),
-		(t |= t >> 2),
-		(t |= t >> 4),
-		(t |= t >> 8),
-		(t |= t >> 16),
-		++t,
-		t
-	);
+  if (typeof t != 'number' || t < 0 || t > 2147483648)
+    throw new n('A number between 0 and 2^31 is required.');
+  return (
+    --t,
+    (t |= t >> 1),
+    (t |= t >> 2),
+    (t |= t >> 4),
+    (t |= t >> 8),
+    (t |= t >> 16),
+    ++t,
+    t
+  );
 };
 r.previousPowerOfTwo = (t) => {
-	if (typeof t != "number" || t < 0 || t > 4294967295)
-		throw new n("A number between 0 and (2^32)-1 is required.");
-	return (
-		(t |= t >> 1),
-		(t |= t >> 2),
-		(t |= t >> 4),
-		(t |= t >> 8),
-		(t |= t >> 16),
-		(t |= t >> 32),
-		(t = (t >>> 0) - (t >>> 1)),
-		t
-	);
+  if (typeof t != 'number' || t < 0 || t > 4294967295)
+    throw new n('A number between 0 and (2^32)-1 is required.');
+  return (
+    (t |= t >> 1),
+    (t |= t >> 2),
+    (t |= t >> 4),
+    (t |= t >> 8),
+    (t |= t >> 16),
+    (t |= t >> 32),
+    (t = (t >>> 0) - (t >>> 1)),
+    t
+  );
 };
 r.clamp = (t, i, e) => (
-	a.typeOf.number("value", t),
-	a.typeOf.number("min", i),
-	a.typeOf.number("max", e),
-	t < i ? i : t > e ? e : t
+  a.typeOf.number('value', t),
+  a.typeOf.number('min', i),
+  a.typeOf.number('max', e),
+  t < i ? i : t > e ? e : t
 );
 var P = new w.default();
 r.setRandomNumberSeed = (t) => {
-	if (!o(t)) throw new n("seed is required.");
-	P = new w.default(t);
+  if (!o(t)) throw new n('seed is required.');
+  P = new w.default(t);
 };
 r.nextRandomNumber = () => P.random();
 r.randomBetween = (t, i) => r.nextRandomNumber() * (i - t) + t;
 r.acosClamped = (t) => {
-	if (!o(t)) throw new n("value is required.");
-	return Math.acos(r.clamp(t, -1, 1));
+  if (!o(t)) throw new n('value is required.');
+  return Math.acos(r.clamp(t, -1, 1));
 };
 r.asinClamped = (t) => {
-	if (!o(t)) throw new n("value is required.");
-	return Math.asin(r.clamp(t, -1, 1));
+  if (!o(t)) throw new n('value is required.');
+  return Math.asin(r.clamp(t, -1, 1));
 };
 r.chordLength = (t, i) => {
-	if (!o(t)) throw new n("angle is required.");
-	if (!o(i)) throw new n("radius is required.");
-	return 2 * i * Math.sin(t * 0.5);
+  if (!o(t)) throw new n('angle is required.');
+  if (!o(i)) throw new n('radius is required.');
+  return 2 * i * Math.sin(t * 0.5);
 };
 r.logBase = (t, i) => {
-	if (!o(t)) throw new n("number is required.");
-	if (!o(i)) throw new n("base is required.");
-	return Math.log(t) / Math.log(i);
+  if (!o(t)) throw new n('number is required.');
+  if (!o(i)) throw new n('base is required.');
+  return Math.log(t) / Math.log(i);
 };
 r.cbrt =
-	Math.cbrt ??
-	((i) => {
-		const e = Math.abs(i) ** 0.3333333333333333;
-		return i < 0 ? -e : e;
-	});
+  Math.cbrt ??
+  ((i) => {
+    const e = Math.abs(i) ** 0.3333333333333333;
+    return i < 0 ? -e : e;
+  });
 r.log2 = Math.log2 ?? ((i) => Math.log(i) * Math.LOG2E);
 r.fog = (t, i) => {
-	const e = t * i;
-	return 1 - Math.exp(-(e * e));
+  const e = t * i;
+  return 1 - Math.exp(-(e * e));
 };
 r.fastApproximateAtan = (t) => (
-	a.typeOf.number("x", t), t * (-0.1784 * Math.abs(t) - 0.0663 * t * t + 1.0301)
+  a.typeOf.number('x', t), t * (-0.1784 * Math.abs(t) - 0.0663 * t * t + 1.0301)
 );
 r.fastApproximateAtan2 = (t, i) => {
-	a.typeOf.number("x", t), a.typeOf.number("y", i);
-	let e,
-		s = Math.abs(t);
-	e = Math.abs(i);
-	const h = Math.max(s, e);
-	e = Math.min(s, e);
-	const u = e / h;
-	if (isNaN(u)) throw new n("either x or y must be nonzero");
-	return (
-		(s = r.fastApproximateAtan(u)),
-		(s = Math.abs(i) > Math.abs(t) ? r.PI_OVER_TWO - s : s),
-		(s = t < 0 ? r.PI - s : s),
-		(s = i < 0 ? -s : s),
-		s
-	);
+  a.typeOf.number('x', t), a.typeOf.number('y', i);
+  let e,
+    s = Math.abs(t);
+  e = Math.abs(i);
+  const h = Math.max(s, e);
+  e = Math.min(s, e);
+  const u = e / h;
+  if (isNaN(u)) throw new n('either x or y must be nonzero');
+  return (
+    (s = r.fastApproximateAtan(u)),
+    (s = Math.abs(i) > Math.abs(t) ? r.PI_OVER_TWO - s : s),
+    (s = t < 0 ? r.PI - s : s),
+    (s = i < 0 ? -s : s),
+    s
+  );
 };
 var M = r;
 export { M as a };

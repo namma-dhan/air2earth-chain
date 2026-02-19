@@ -1,34 +1,35 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import 'normalize.css';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
 import * as Cesium from 'cesium';
 import './AqiCesium.css';
-import { Toolbox } from './components/shared/Toolbox';
-import { ImpactPopup } from './components/ImpactPopup';
-import { TotalImpactPanel } from './components/TotalImpactPanel';
-import { GreenRewardsPanel } from './components/GreenRewardsPanel';
 import { ImmersiveVRScene, VRButton } from '../../components/vr';
 import {
-  estimateTreeImpact,
+  type AqiStationRaw,
+  type BlockchainAqiResponse,
+  fetchAqiFromBlockchain,
+  fetchTreesFromBlockchain,
+  storeTreeOnBlockchain,
+  type TreeClaimData,
+} from '../../lib/algorand/aqi-service';
+import { GreenRewardsPanel } from './components/GreenRewardsPanel';
+import { ImpactPopup } from './components/ImpactPopup';
+import { Toolbox } from './components/shared/Toolbox';
+import { TotalImpactPanel } from './components/TotalImpactPanel';
+import {
+  calculateTotalImpact,
   estimateGardenImpact,
   estimatePurifierImpact,
-  calculateTotalImpact,
-  type ImpactData
+  estimateTreeImpact,
+  type ImpactData,
 } from './utils/calculations';
-import {
-  fetchAqiFromBlockchain,
-  storeTreeOnBlockchain,
-  fetchTreesFromBlockchain,
-  type TreeClaimData,
-  type AqiStationRaw,
-  type BlockchainAqiResponse
-} from '../../lib/algorand/aqi-service';
 
 const ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
 // Set Cesium base URL to CDN so assets resolve correctly under webpack/Next.js
-(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
+(window as any).CESIUM_BASE_URL =
+  'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
 // ─────────────────────────────────────────────────────────────
@@ -52,7 +53,7 @@ interface StationData {
  */
 function processRawData(rawData: AqiStationRaw[]): StationData[] {
   return rawData
-    .filter((station) => station.aqi !== "-")
+    .filter((station) => station.aqi !== '-')
     .map((station) => ({
       name: station.station.name,
       latitude: station.lat,
@@ -69,8 +70,8 @@ let aqiData: StationData[] = [];
 
 // Compute bounds from station coordinates with padding
 const computeBounds = () => {
-  const lons = aqiData.map(s => s.longitude);
-  const lats = aqiData.map(s => s.latitude);
+  const lons = aqiData.map((s) => s.longitude);
+  const lats = aqiData.map((s) => s.latitude);
   const padding = 0.5; // degrees - larger padding for South India coverage
   return {
     west: Math.min(...lons) - padding,
@@ -82,11 +83,11 @@ const computeBounds = () => {
 
 // Get AQI color as RGB values
 function getAqiRGB(aqi: number): [number, number, number] {
-  if (aqi <= 50) return [0, 228, 0];       // Good - Green
-  if (aqi <= 100) return [255, 255, 0];    // Moderate - Yellow
-  if (aqi <= 150) return [255, 126, 0];    // Unhealthy for Sensitive - Orange
-  if (aqi <= 200) return [255, 0, 0];      // Very Unhealthy - Red
-  return [143, 63, 151];                    // Hazardous - Purple
+  if (aqi <= 50) return [0, 228, 0]; // Good - Green
+  if (aqi <= 100) return [255, 255, 0]; // Moderate - Yellow
+  if (aqi <= 150) return [255, 126, 0]; // Unhealthy for Sensitive - Orange
+  if (aqi <= 200) return [255, 0, 0]; // Very Unhealthy - Red
+  return [143, 63, 151]; // Hazardous - Purple
 }
 
 // Create heatmap on canvas
@@ -94,7 +95,7 @@ function createHeatmapCanvas(
   width: number,
   height: number,
   data: { x: number; y: number; value: number }[],
-  maxValue: number
+  maxValue: number,
 ): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -107,14 +108,18 @@ function createHeatmapCanvas(
   // Draw each data point as a radial gradient
   const radius = 180; // Larger radius for smoother blending
 
-  data.forEach(point => {
+  data.forEach((point) => {
     const [r, g, b] = getAqiRGB(point.value);
     const intensity = Math.min(point.value / maxValue, 1);
 
     // Create radial gradient for smooth blending
     const gradient = ctx.createRadialGradient(
-      point.x, point.y, 0,
-      point.x, point.y, radius
+      point.x,
+      point.y,
+      0,
+      point.x,
+      point.y,
+      radius,
     );
 
     // Center is more opaque, edges fade out smoothly
@@ -134,20 +139,32 @@ function createHeatmapCanvas(
 }
 
 // Get AQI category and color
-function getAqiInfo(aqi: number): { category: string; color: string; cssColor: string } {
-  if (aqi <= 50) return { category: "Good", color: "green", cssColor: "#00e400" };
-  if (aqi <= 100) return { category: "Moderate", color: "yellow", cssColor: "#ffff00" };
-  if (aqi <= 150) return { category: "Unhealthy for Sensitive", color: "orange", cssColor: "#ff7e00" };
-  if (aqi <= 200) return { category: "Very Unhealthy", color: "red", cssColor: "#ff0000" };
-  return { category: "Hazardous", color: "purple", cssColor: "#8f3f97" };
+function getAqiInfo(aqi: number): {
+  category: string;
+  color: string;
+  cssColor: string;
+} {
+  if (aqi <= 50)
+    return { category: 'Good', color: 'green', cssColor: '#00e400' };
+  if (aqi <= 100)
+    return { category: 'Moderate', color: 'yellow', cssColor: '#ffff00' };
+  if (aqi <= 150)
+    return {
+      category: 'Unhealthy for Sensitive',
+      color: 'orange',
+      cssColor: '#ff7e00',
+    };
+  if (aqi <= 200)
+    return { category: 'Very Unhealthy', color: 'red', cssColor: '#ff0000' };
+  return { category: 'Hazardous', color: 'purple', cssColor: '#8f3f97' };
 }
 
 function getCesiumColor(aqi: number): Cesium.Color {
-  if (aqi <= 50) return Cesium.Color.fromCssColorString("#00e400");
-  if (aqi <= 100) return Cesium.Color.fromCssColorString("#ffff00");
-  if (aqi <= 150) return Cesium.Color.fromCssColorString("#ff7e00");
-  if (aqi <= 200) return Cesium.Color.fromCssColorString("#ff0000");
-  return Cesium.Color.fromCssColorString("#8f3f97");
+  if (aqi <= 50) return Cesium.Color.fromCssColorString('#00e400');
+  if (aqi <= 100) return Cesium.Color.fromCssColorString('#ffff00');
+  if (aqi <= 150) return Cesium.Color.fromCssColorString('#ff7e00');
+  if (aqi <= 200) return Cesium.Color.fromCssColorString('#ff0000');
+  return Cesium.Color.fromCssColorString('#8f3f97');
 }
 
 interface PopupInfo {
@@ -161,11 +178,18 @@ function AqiCesiumApp() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Cesium.Viewer | null>(null);
 
-  const [popup, setPopup] = useState<PopupInfo>({ visible: false, x: 0, y: 0, station: null });
+  const [popup, setPopup] = useState<PopupInfo>({
+    visible: false,
+    x: 0,
+    y: 0,
+    station: null,
+  });
   const [viewer, setViewer] = useState<Cesium.Viewer | null>(null);
 
   // Blockchain data source state
-  const [dataSource, setDataSource] = useState<'loading' | 'algorand-blockchain' | 'error'>('loading');
+  const [dataSource, setDataSource] = useState<
+    'loading' | 'algorand-blockchain' | 'error'
+  >('loading');
   const [blockchainAppId, setBlockchainAppId] = useState<number | null>(null);
   const [stationCount, setStationCount] = useState<number>(0);
   const [blockchainReady, setBlockchainReady] = useState(false);
@@ -173,7 +197,10 @@ function AqiCesiumApp() {
 
   // Impact popup state
   const [currentImpact, setCurrentImpact] = useState<ImpactData | null>(null);
-  const [impactPosition, setImpactPosition] = useState<{ x: number; y: number } | null>(null);
+  const [impactPosition, setImpactPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [allImpacts, setAllImpacts] = useState<ImpactData[]>([]);
 
   // Wind & Pollution simulation state
@@ -206,69 +233,83 @@ function AqiCesiumApp() {
   }, [showWind, windSpeed, windDirection, showPollution]);
 
   // Handle placement completed events from PlacementManager
-  const handlePlacementCompleted = useCallback(async (event: CustomEvent<{
-    tool: string;
-    position?: Cesium.Cartesian3;
-    screenPosition: { x: number; y: number } | null;
-    areaM2?: number;
-  }>) => {
-    const { tool, screenPosition, position, areaM2 } = event.detail;
+  const handlePlacementCompleted = useCallback(
+    async (
+      event: CustomEvent<{
+        tool: string;
+        position?: Cesium.Cartesian3;
+        screenPosition: { x: number; y: number } | null;
+        areaM2?: number;
+      }>,
+    ) => {
+      const { tool, screenPosition, position, areaM2 } = event.detail;
 
-    let impact: ImpactData | null = null;
+      let impact: ImpactData | null = null;
 
-    if (tool === 'tree') {
-      impact = estimateTreeImpact();
+      if (tool === 'tree') {
+        impact = estimateTreeImpact();
 
-      // Ensure we have world coordinates to save on protocol
-      if (position) {
-        const carto = Cesium.Cartographic.fromCartesian(position);
-        const lat = Cesium.Math.toDegrees(carto.latitude);
-        const lon = Cesium.Math.toDegrees(carto.longitude);
+        // Ensure we have world coordinates to save on protocol
+        if (position) {
+          const carto = Cesium.Cartographic.fromCartesian(position);
+          const lat = Cesium.Math.toDegrees(carto.latitude);
+          const lon = Cesium.Math.toDegrees(carto.longitude);
 
-        const claimData: TreeClaimData = {
-          treeId: `tree-${Date.now()}`,
-          planter: "AeroEarth User",
-          location: { lat, lon },
-          variety: "Virtual Tree Placement",
-          plantedAt: new Date().toISOString(),
-          co2OffsetKg: impact.co2Absorbed,
-          notes: "Planted securely via AeroEarth frontend"
-        };
+          const claimData: TreeClaimData = {
+            treeId: `tree-${Date.now()}`,
+            planter: 'AeroEarth User',
+            location: { lat, lon },
+            variety: 'Virtual Tree Placement',
+            plantedAt: new Date().toISOString(),
+            co2OffsetKg: impact.co2Absorbed,
+            notes: 'Planted securely via AeroEarth frontend',
+          };
 
-        try {
-          // Send to our secure backend API to be certified on the blockchain
-          const result = await storeTreeOnBlockchain(claimData);
-          console.log('[AqiCesiumApp] ✅ Tree securely stored on Algorand:', result.txId);
-          // Bump treeCount to trigger rewards panel refresh
-          setTreeCount(c => c + 1);
-        } catch (e: any) {
-          console.error('[AqiCesiumApp] ❌ Failed to record on chain:', e);
+          try {
+            // Send to our secure backend API to be certified on the blockchain
+            const result = await storeTreeOnBlockchain(claimData);
+            console.log(
+              '[AqiCesiumApp] ✅ Tree securely stored on Algorand:',
+              result.txId,
+            );
+            // Bump treeCount to trigger rewards panel refresh
+            setTreeCount((c) => c + 1);
+          } catch (e: any) {
+            console.error('[AqiCesiumApp] ❌ Failed to record on chain:', e);
+          }
         }
+      } else if (tool === 'garden') {
+        impact = estimateGardenImpact(areaM2 || 15);
+      } else if (tool === 'purifier') {
+        impact = estimatePurifierImpact();
       }
-    } else if (tool === 'garden') {
-      impact = estimateGardenImpact(areaM2 || 15);
-    } else if (tool === 'purifier') {
-      impact = estimatePurifierImpact();
-    }
 
-    if (impact) {
-      setCurrentImpact(impact as ImpactData);
-      setImpactPosition(screenPosition);
-      setAllImpacts(prev => [...prev, impact! as ImpactData]);
+      if (impact) {
+        setCurrentImpact(impact as ImpactData);
+        setImpactPosition(screenPosition);
+        setAllImpacts((prev) => [...prev, impact! as ImpactData]);
 
-      // Auto-hide popup after 5 seconds
-      setTimeout(() => {
-        setCurrentImpact(null);
-        setImpactPosition(null);
-      }, 5000);
-    }
-  }, []);
+        // Auto-hide popup after 5 seconds
+        setTimeout(() => {
+          setCurrentImpact(null);
+          setImpactPosition(null);
+        }, 5000);
+      }
+    },
+    [],
+  );
 
   // Listen for placement events
   useEffect(() => {
-    window.addEventListener('placement-completed', handlePlacementCompleted as unknown as EventListener);
+    window.addEventListener(
+      'placement-completed',
+      handlePlacementCompleted as unknown as EventListener,
+    );
     return () => {
-      window.removeEventListener('placement-completed', handlePlacementCompleted as unknown as EventListener);
+      window.removeEventListener(
+        'placement-completed',
+        handlePlacementCompleted as unknown as EventListener,
+      );
     };
   }, [handlePlacementCompleted]);
 
@@ -279,7 +320,8 @@ function AqiCesiumApp() {
       if (viewerRef.current && !viewerRef.current.isDestroyed()) {
         const v = viewerRef.current;
         // Recalculate average AQI
-        const avgAqi = aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
+        const avgAqi =
+          aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
 
         // Recreate shaders (they were removed during VR optimization)
         try {
@@ -361,7 +403,7 @@ function AqiCesiumApp() {
     `;
 
     const stage = new Cesium.PostProcessStage({
-      name: "wind_effect",
+      name: 'wind_effect',
       fragmentShader: fragmentShader,
       uniforms: {
         windSpeed: () => windSpeedRef.current,
@@ -414,7 +456,7 @@ function AqiCesiumApp() {
     `;
 
     const stage = new Cesium.PostProcessStage({
-      name: "pollution_haze",
+      name: 'pollution_haze',
       fragmentShader: fragmentShader,
       uniforms: {
         aqiLevel: () => avgAqi,
@@ -433,7 +475,9 @@ function AqiCesiumApp() {
   useEffect(() => {
     const loadBlockchainData = async () => {
       try {
-        console.log('[AqiCesiumApp] 🔗 Fetching AQI data from Algorand blockchain...');
+        console.log(
+          '[AqiCesiumApp] 🔗 Fetching AQI data from Algorand blockchain...',
+        );
         const response = await fetchAqiFromBlockchain();
 
         // Update the module-level aqiData with blockchain data
@@ -447,12 +491,17 @@ function AqiCesiumApp() {
         }
 
         console.log(
-          `[AqiCesiumApp] ✅ Loaded ${response.data.length} stations from Algorand blockchain`
+          `[AqiCesiumApp] ✅ Loaded ${response.data.length} stations from Algorand blockchain`,
         );
       } catch (err: any) {
-        console.error('[AqiCesiumApp] ❌ Failed to fetch from blockchain:', err);
+        console.error(
+          '[AqiCesiumApp] ❌ Failed to fetch from blockchain:',
+          err,
+        );
         setDataSource('error');
-        setBlockchainError(err?.message || 'Failed to connect to Algorand blockchain');
+        setBlockchainError(
+          err?.message || 'Failed to connect to Algorand blockchain',
+        );
       }
     };
 
@@ -461,7 +510,8 @@ function AqiCesiumApp() {
 
   // Only initialize Cesium AFTER blockchain data is loaded
   useEffect(() => {
-    if (!containerRef.current || !blockchainReady || aqiData.length === 0) return;
+    if (!containerRef.current || !blockchainReady || aqiData.length === 0)
+      return;
     let aborted = false;
 
     const initializeCesium = async () => {
@@ -502,29 +552,32 @@ function AqiCesiumApp() {
         };
 
         // Create conditions for each station area (using lat/lon boxes)
-        const buildingConditions: [string, string][] = aqiData.map(station => {
-          const latMin = station.latitude - 0.1;
-          const latMax = station.latitude + 0.1;
-          const lonMin = station.longitude - 0.1;
-          const lonMax = station.longitude + 0.1;
-          const condition = `\${feature['cesium#latitude']} > ${latMin} && \${feature['cesium#latitude']} < ${latMax} && \${feature['cesium#longitude']} > ${lonMin} && \${feature['cesium#longitude']} < ${lonMax}`;
-          return [condition, getAqiColorCondition(station.aqi)];
-        });
+        const buildingConditions: [string, string][] = aqiData.map(
+          (station) => {
+            const latMin = station.latitude - 0.1;
+            const latMax = station.latitude + 0.1;
+            const lonMin = station.longitude - 0.1;
+            const lonMax = station.longitude + 0.1;
+            const condition = `\${feature['cesium#latitude']} > ${latMin} && \${feature['cesium#latitude']} < ${latMax} && \${feature['cesium#longitude']} > ${lonMin} && \${feature['cesium#longitude']} < ${lonMax}`;
+            return [condition, getAqiColorCondition(station.aqi)];
+          },
+        );
 
         // Add default condition
-        buildingConditions.push(["true", "color('rgba(200, 200, 200, 0.6)')"]);
+        buildingConditions.push(['true', "color('rgba(200, 200, 200, 0.6)')"]);
 
         // Style buildings with AQI colors based on their location
         osmBuildingsTileset.style = new Cesium.Cesium3DTileStyle({
           color: {
-            conditions: buildingConditions
-          }
+            conditions: buildingConditions,
+          },
         });
 
         console.log('3D OSM Buildings loaded with AQI styling');
 
         // Calculate average AQI for pollution shader
-        const avgAqi = aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
+        const avgAqi =
+          aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
 
         // Initialize wind and pollution shaders
         createWindStage(viewer);
@@ -547,25 +600,30 @@ function AqiCesiumApp() {
             return "color('rgba(143, 63, 151, 0.7)')";
           };
 
-          const buildingConditions: [string, string][] = aqiData.map(station => {
-            const latMin = station.latitude - 0.1;
-            const latMax = station.latitude + 0.1;
-            const lonMin = station.longitude - 0.1;
-            const lonMax = station.longitude + 0.1;
-            const condition = `\${feature['cesium#latitude']} > ${latMin} && \${feature['cesium#latitude']} < ${latMax} && \${feature['cesium#longitude']} > ${lonMin} && \${feature['cesium#longitude']} < ${lonMax}`;
-            return [condition, getAqiColorCondition(station.aqi)];
-          });
-          buildingConditions.push(["true", "color('rgba(200, 200, 200, 0.6)')"]);
+          const buildingConditions: [string, string][] = aqiData.map(
+            (station) => {
+              const latMin = station.latitude - 0.1;
+              const latMax = station.latitude + 0.1;
+              const lonMin = station.longitude - 0.1;
+              const lonMax = station.longitude + 0.1;
+              const condition = `\${feature['cesium#latitude']} > ${latMin} && \${feature['cesium#latitude']} < ${latMax} && \${feature['cesium#longitude']} > ${lonMin} && \${feature['cesium#longitude']} < ${lonMax}`;
+              return [condition, getAqiColorCondition(station.aqi)];
+            },
+          );
+          buildingConditions.push([
+            'true',
+            "color('rgba(200, 200, 200, 0.6)')",
+          ]);
 
           osmBuildingsTileset.style = new Cesium.Cesium3DTileStyle({
             color: {
-              conditions: buildingConditions
-            }
+              conditions: buildingConditions,
+            },
           });
         } else {
           // Original building colors when zoomed in close
           osmBuildingsTileset.style = new Cesium.Cesium3DTileStyle({
-            color: "color('white')"
+            color: "color('white')",
           });
         }
       };
@@ -582,29 +640,43 @@ function AqiCesiumApp() {
       const latRange = bounds.north - bounds.south;
 
       // Prepare heatmap data with pixel coordinates
-      const heatmapData = aqiData.map(station => {
-        const x = Math.round(((station.longitude - bounds.west) / lonRange) * heatmapWidth);
-        const y = Math.round(((bounds.north - station.latitude) / latRange) * heatmapHeight);
-        console.log(`Station ${station.name}: pixel (${x}, ${y}), AQI: ${station.aqi}`);
+      const heatmapData = aqiData.map((station) => {
+        const x = Math.round(
+          ((station.longitude - bounds.west) / lonRange) * heatmapWidth,
+        );
+        const y = Math.round(
+          ((bounds.north - station.latitude) / latRange) * heatmapHeight,
+        );
+        console.log(
+          `Station ${station.name}: pixel (${x}, ${y}), AQI: ${station.aqi}`,
+        );
         return { x, y, value: station.aqi };
       });
 
       // Create heatmap canvas
-      const heatmapCanvas = createHeatmapCanvas(heatmapWidth, heatmapHeight, heatmapData, 200);
+      const heatmapCanvas = createHeatmapCanvas(
+        heatmapWidth,
+        heatmapHeight,
+        heatmapData,
+        200,
+      );
       const imageUrl = heatmapCanvas.toDataURL('image/png');
       console.log('Heatmap image created, URL length:', imageUrl.length);
 
       // Add heatmap as a ground overlay using SingleTileImageryProvider
       let heatmapLayer: Cesium.ImageryLayer | null = null;
       try {
-        const heatmapProvider = await Cesium.SingleTileImageryProvider.fromUrl(imageUrl, {
-          rectangle: Cesium.Rectangle.fromDegrees(
-            bounds.west,
-            bounds.south,
-            bounds.east,
-            bounds.north
-          ),
-        });
+        const heatmapProvider = await Cesium.SingleTileImageryProvider.fromUrl(
+          imageUrl,
+          {
+            rectangle: Cesium.Rectangle.fromDegrees(
+              bounds.west,
+              bounds.south,
+              bounds.east,
+              bounds.north,
+            ),
+          },
+        );
         if (aborted || viewer.isDestroyed()) return;
 
         heatmapLayer = viewer.imageryLayers.addImageryProvider(heatmapProvider);
@@ -624,7 +696,7 @@ function AqiCesiumApp() {
 
         // Define height thresholds for heatmap visibility
         const fadeStartHeight = 15000; // Start fading at 15km
-        const fadeEndHeight = 3000;    // Fully hidden at 3km
+        const fadeEndHeight = 3000; // Fully hidden at 3km
         const buildingStyleThreshold = 5000; // Switch building style at 5km
 
         // Update heatmap alpha
@@ -637,7 +709,9 @@ function AqiCesiumApp() {
             heatmapLayer.alpha = 0;
           } else {
             // Gradual fade between thresholds
-            const fadeRatio = (cameraHeight - fadeEndHeight) / (fadeStartHeight - fadeEndHeight);
+            const fadeRatio =
+              (cameraHeight - fadeEndHeight) /
+              (fadeStartHeight - fadeEndHeight);
             heatmapLayer.alpha = 0.5 * fadeRatio;
           }
         }
@@ -663,7 +737,11 @@ function AqiCesiumApp() {
         // Add point marker - bigger and bolder
         viewer.entities.add({
           id: `station-${station.uid}`,
-          position: Cesium.Cartesian3.fromDegrees(station.longitude, station.latitude, 100),
+          position: Cesium.Cartesian3.fromDegrees(
+            station.longitude,
+            station.latitude,
+            100,
+          ),
           point: {
             pixelSize: 18,
             color: color,
@@ -683,7 +761,12 @@ function AqiCesiumApp() {
             pixelOffset: new Cesium.Cartesian2(0, -20),
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
             scaleByDistance: new Cesium.NearFarScalar(5000, 1.0, 200000, 0.4),
-            translucencyByDistance: new Cesium.NearFarScalar(5000, 1.0, 300000, 0.0),
+            translucencyByDistance: new Cesium.NearFarScalar(
+              5000,
+              1.0,
+              300000,
+              0.0,
+            ),
           },
           properties: {
             stationData: station,
@@ -708,56 +791,62 @@ function AqiCesiumApp() {
       // Click handler for station details popup and building highlighting
       const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
-      handler.setInputAction((click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
-        const pickedObject = viewer.scene.pick(click.position);
+      handler.setInputAction(
+        (click: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
+          const pickedObject = viewer.scene.pick(click.position);
 
-        // Reset previously highlighted building
-        if (highlightedFeature && originalColor) {
-          highlightedFeature.color = originalColor;
-          highlightedFeature = null;
-          originalColor = null;
-        }
-
-        if (Cesium.defined(pickedObject)) {
-          // Check if it's a station marker
-          if (pickedObject.id && pickedObject.id.properties) {
-            const stationData = pickedObject.id.properties.stationData?.getValue(Cesium.JulianDate.now());
-
-            if (stationData) {
-              setPopup({
-                visible: true,
-                x: click.position.x,
-                y: click.position.y,
-                station: stationData,
-              });
-              return;
-            }
+          // Reset previously highlighted building
+          if (highlightedFeature && originalColor) {
+            highlightedFeature.color = originalColor;
+            highlightedFeature = null;
+            originalColor = null;
           }
 
-          // Check if it's a 3D building tile
-          if (pickedObject instanceof Cesium.Cesium3DTileFeature) {
-            const feature = pickedObject as Cesium.Cesium3DTileFeature;
+          if (Cesium.defined(pickedObject)) {
+            // Check if it's a station marker
+            if (pickedObject.id && pickedObject.id.properties) {
+              const stationData =
+                pickedObject.id.properties.stationData?.getValue(
+                  Cesium.JulianDate.now(),
+                );
 
-            // Get building location to determine AQI zone
-            const latitude = feature.getProperty('cesium#latitude') as number;
-
-            if (latitude) {
-              // Store original color and highlight with AQI color
-              originalColor = feature.color.clone();
-              highlightedFeature = feature;
-
-              const aqiColorStr = getAqiColorForLocation(latitude);
-              feature.color = Cesium.Color.fromCssColorString(aqiColorStr);
+              if (stationData) {
+                setPopup({
+                  visible: true,
+                  x: click.position.x,
+                  y: click.position.y,
+                  station: stationData,
+                });
+                return;
+              }
             }
 
-            setPopup({ visible: false, x: 0, y: 0, station: null });
+            // Check if it's a 3D building tile
+            if (pickedObject instanceof Cesium.Cesium3DTileFeature) {
+              const feature = pickedObject as Cesium.Cesium3DTileFeature;
+
+              // Get building location to determine AQI zone
+              const latitude = feature.getProperty('cesium#latitude') as number;
+
+              if (latitude) {
+                // Store original color and highlight with AQI color
+                originalColor = feature.color.clone();
+                highlightedFeature = feature;
+
+                const aqiColorStr = getAqiColorForLocation(latitude);
+                feature.color = Cesium.Color.fromCssColorString(aqiColorStr);
+              }
+
+              setPopup({ visible: false, x: 0, y: 0, station: null });
+            } else {
+              setPopup({ visible: false, x: 0, y: 0, station: null });
+            }
           } else {
             setPopup({ visible: false, x: 0, y: 0, station: null });
           }
-        } else {
-          setPopup({ visible: false, x: 0, y: 0, station: null });
-        }
-      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        },
+        Cesium.ScreenSpaceEventType.LEFT_CLICK,
+      );
 
       // Close popup on right-click or camera move
       handler.setInputAction(() => {
@@ -765,7 +854,7 @@ function AqiCesiumApp() {
       }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
       viewer.camera.moveEnd.addEventListener(() => {
-        setPopup(prev => prev.visible ? { ...prev, visible: false } : prev);
+        setPopup((prev) => (prev.visible ? { ...prev, visible: false } : prev));
       });
 
       // Fly camera to fit all stations
@@ -774,7 +863,7 @@ function AqiCesiumApp() {
           bounds.west,
           bounds.south,
           bounds.east,
-          bounds.north
+          bounds.north,
         ),
         duration: 2,
         orientation: {
@@ -804,13 +893,52 @@ function AqiCesiumApp() {
   // ─── Loading State: Waiting for blockchain data ───
   if (dataSource === 'loading') {
     return (
-      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0e1a', color: '#fff', fontFamily: 'monospace' }}>
+      <div
+        className="app-container"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0a0e1a',
+          color: '#fff',
+          fontFamily: 'monospace',
+        }}
+      >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 20, animation: 'pulse 1.5s infinite' }}>⛓️</div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Connecting to Algorand Blockchain</h2>
-          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 20 }}>Fetching decentralized AQI data from the chain...</p>
-          <div style={{ width: 200, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden', margin: '0 auto' }}>
-            <div style={{ width: '60%', height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: 2, animation: 'loading-bar 1.5s infinite ease-in-out' }} />
+          <div
+            style={{
+              fontSize: 48,
+              marginBottom: 20,
+              animation: 'pulse 1.5s infinite',
+            }}
+          >
+            ⛓️
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
+            Connecting to Algorand Blockchain
+          </h2>
+          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 20 }}>
+            Fetching decentralized AQI data from the chain...
+          </p>
+          <div
+            style={{
+              width: 200,
+              height: 4,
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: 2,
+              overflow: 'hidden',
+              margin: '0 auto',
+            }}
+          >
+            <div
+              style={{
+                width: '60%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                borderRadius: 2,
+                animation: 'loading-bar 1.5s infinite ease-in-out',
+              }}
+            />
           </div>
         </div>
         <style>{`
@@ -824,15 +952,57 @@ function AqiCesiumApp() {
   // ─── Error State: Blockchain unreachable ───
   if (dataSource === 'error') {
     return (
-      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0e1a', color: '#fff', fontFamily: 'monospace' }}>
+      <div
+        className="app-container"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0a0e1a',
+          color: '#fff',
+          fontFamily: 'monospace',
+        }}
+      >
         <div style={{ textAlign: 'center', maxWidth: 500 }}>
           <div style={{ fontSize: 48, marginBottom: 20 }}>🔴</div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, color: '#ef4444' }}>Blockchain Unavailable</h2>
-          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 16 }}>{blockchainError}</p>
-          <p style={{ fontSize: 12, opacity: 0.5, marginBottom: 24 }}>Make sure AlgoKit LocalNet is running:<br /><code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 4 }}>algokit localnet start</code></p>
+          <h2
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              marginBottom: 8,
+              color: '#ef4444',
+            }}
+          >
+            Blockchain Unavailable
+          </h2>
+          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 16 }}>
+            {blockchainError}
+          </p>
+          <p style={{ fontSize: 12, opacity: 0.5, marginBottom: 24 }}>
+            Make sure AlgoKit LocalNet is running:
+            <br />
+            <code
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                padding: '2px 8px',
+                borderRadius: 4,
+              }}
+            >
+              algokit localnet start
+            </code>
+          </p>
           <button
             onClick={() => window.location.reload()}
-            style={{ padding: '10px 24px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600 }}
+            style={{
+              padding: '10px 24px',
+              background: '#3b82f6',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontSize: 14,
+              fontWeight: 600,
+            }}
           >
             Retry Connection
           </button>
@@ -859,17 +1029,19 @@ function AqiCesiumApp() {
           padding: '8px 14px',
           borderRadius: 8,
           backdropFilter: 'blur(12px)',
-          background: dataSource === 'algorand-blockchain'
-            ? 'rgba(16, 185, 129, 0.15)'
-            : dataSource === 'loading'
-              ? 'rgba(59, 130, 246, 0.15)'
-              : 'rgba(245, 158, 11, 0.15)',
-          border: `1px solid ${dataSource === 'algorand-blockchain'
-            ? 'rgba(16, 185, 129, 0.4)'
-            : dataSource === 'loading'
-              ? 'rgba(59, 130, 246, 0.4)'
-              : 'rgba(245, 158, 11, 0.4)'
-            }`,
+          background:
+            dataSource === 'algorand-blockchain'
+              ? 'rgba(16, 185, 129, 0.15)'
+              : dataSource === 'loading'
+                ? 'rgba(59, 130, 246, 0.15)'
+                : 'rgba(245, 158, 11, 0.15)',
+          border: `1px solid ${
+            dataSource === 'algorand-blockchain'
+              ? 'rgba(16, 185, 129, 0.4)'
+              : dataSource === 'loading'
+                ? 'rgba(59, 130, 246, 0.4)'
+                : 'rgba(245, 158, 11, 0.4)'
+          }`,
           color: '#fff',
           fontSize: 12,
           fontFamily: 'monospace',
@@ -888,7 +1060,8 @@ function AqiCesiumApp() {
                 : dataSource === 'loading'
                   ? '#3b82f6'
                   : '#f59e0b',
-            animation: dataSource === 'loading' ? 'pulse 1.5s infinite' : 'none',
+            animation:
+              dataSource === 'loading' ? 'pulse 1.5s infinite' : 'none',
           }}
         />
         <span>
@@ -915,23 +1088,38 @@ function AqiCesiumApp() {
       <div className="legend">
         <h3>Air Quality Index</h3>
         <div className="legend-item">
-          <span className="legend-color" style={{ backgroundColor: '#00e400' }}></span>
+          <span
+            className="legend-color"
+            style={{ backgroundColor: '#00e400' }}
+          ></span>
           <span>0-50: Good</span>
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ backgroundColor: '#ffff00' }}></span>
+          <span
+            className="legend-color"
+            style={{ backgroundColor: '#ffff00' }}
+          ></span>
           <span>51-100: Moderate</span>
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ backgroundColor: '#ff7e00' }}></span>
+          <span
+            className="legend-color"
+            style={{ backgroundColor: '#ff7e00' }}
+          ></span>
           <span>101-150: Unhealthy (Sensitive)</span>
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ backgroundColor: '#ff0000' }}></span>
+          <span
+            className="legend-color"
+            style={{ backgroundColor: '#ff0000' }}
+          ></span>
           <span>151-200: Very Unhealthy</span>
         </div>
         <div className="legend-item">
-          <span className="legend-color" style={{ backgroundColor: '#8f3f97' }}></span>
+          <span
+            className="legend-color"
+            style={{ backgroundColor: '#8f3f97' }}
+          ></span>
           <span>201+: Hazardous</span>
         </div>
       </div>
@@ -947,7 +1135,9 @@ function AqiCesiumApp() {
               const newState = !showWind;
               setShowWind(newState);
               // Play/pause wind audio
-              const audio = document.getElementById('wind-audio') as HTMLAudioElement;
+              const audio = document.getElementById(
+                'wind-audio',
+              ) as HTMLAudioElement;
               if (audio) {
                 if (newState) {
                   audio.volume = Math.min(windSpeed / 20, 1);
@@ -976,7 +1166,9 @@ function AqiCesiumApp() {
               onChange={(e) => {
                 const val = parseFloat(e.target.value);
                 setWindSpeed(val);
-                const audio = document.getElementById('wind-audio') as HTMLAudioElement;
+                const audio = document.getElementById(
+                  'wind-audio',
+                ) as HTMLAudioElement;
                 if (audio) audio.volume = Math.min(val / 20, 1);
               }}
             />
@@ -1015,21 +1207,39 @@ function AqiCesiumApp() {
           className="station-popup"
           style={{
             left: Math.min(popup.x, window.innerWidth - 280),
-            top: Math.min(popup.y, window.innerHeight - 200)
+            top: Math.min(popup.y, window.innerHeight - 200),
           }}
         >
-          <button className="popup-close" onClick={closePopup}>×</button>
+          <button className="popup-close" onClick={closePopup}>
+            ×
+          </button>
           <h4>{popup.station.name}</h4>
           <div className="popup-content">
-            <div className="popup-aqi" style={{ backgroundColor: getAqiInfo(popup.station.aqi).cssColor }}>
+            <div
+              className="popup-aqi"
+              style={{
+                backgroundColor: getAqiInfo(popup.station.aqi).cssColor,
+              }}
+            >
               <span className="aqi-value">{popup.station.aqi}</span>
               <span className="aqi-label">AQI</span>
             </div>
             <div className="popup-details">
-              <p><strong>Category:</strong> {getAqiInfo(popup.station.aqi).category}</p>
-              <p><strong>Latitude:</strong> {popup.station.latitude.toFixed(4)}°</p>
-              <p><strong>Longitude:</strong> {popup.station.longitude.toFixed(4)}°</p>
-              <p><strong>Updated:</strong> {new Date(popup.station.time).toLocaleString()}</p>
+              <p>
+                <strong>Category:</strong>{' '}
+                {getAqiInfo(popup.station.aqi).category}
+              </p>
+              <p>
+                <strong>Latitude:</strong> {popup.station.latitude.toFixed(4)}°
+              </p>
+              <p>
+                <strong>Longitude:</strong> {popup.station.longitude.toFixed(4)}
+                °
+              </p>
+              <p>
+                <strong>Updated:</strong>{' '}
+                {new Date(popup.station.time).toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -1049,23 +1259,16 @@ function AqiCesiumApp() {
       />
 
       {/* 🌿 Green Rewards Panel — live on-chain balance */}
-      <GreenRewardsPanel
-        refreshTrigger={treeCount}
-      />
+      <GreenRewardsPanel refreshTrigger={treeCount} />
 
       {/* VR Mode Button */}
       <div className="absolute bottom-5 right-5 z-10">
-        <VRButton
-          onEnterVR={() => setIsVRMode(true)}
-        />
+        <VRButton onEnterVR={() => setIsVRMode(true)} />
       </div>
 
       {/* VR Scene Overlay */}
       {isVRMode && viewer && (
-        <ImmersiveVRScene
-          viewer={viewer}
-          onExitVR={() => setIsVRMode(false)}
-        />
+        <ImmersiveVRScene viewer={viewer} onExitVR={() => setIsVRMode(false)} />
       )}
     </div>
   );

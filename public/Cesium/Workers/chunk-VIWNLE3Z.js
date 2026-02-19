@@ -23,90 +23,90 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { e as u } from "./chunk-4TAASUQ2.js";
+import { e as u } from './chunk-4TAASUQ2.js';
 
 function f(t) {
-	(this.name = "DeveloperError"), (this.message = t);
-	let e;
-	try {
-		throw new Error();
-	} catch (o) {
-		e = o.stack;
-	}
-	this.stack = e;
+  (this.name = 'DeveloperError'), (this.message = t);
+  let e;
+  try {
+    throw new Error();
+  } catch (o) {
+    e = o.stack;
+  }
+  this.stack = e;
 }
 u(Object.create) &&
-	((f.prototype = Object.create(Error.prototype)),
-	(f.prototype.constructor = f));
+  ((f.prototype = Object.create(Error.prototype)),
+  (f.prototype.constructor = f));
 f.prototype.toString = function () {
-	let t = `${this.name}: ${this.message}`;
-	return (
-		u(this.stack) &&
-			(t += `
+  let t = `${this.name}: ${this.message}`;
+  return (
+    u(this.stack) &&
+      (t += `
 ${this.stack.toString()}`),
-		t
-	);
+    t
+  );
 };
 f.throwInstantiationError = () => {
-	throw new f(
-		"This function defines an interface and should not be called directly.",
-	);
+  throw new f(
+    'This function defines an interface and should not be called directly.',
+  );
 };
 var r = f;
 var n = {};
 n.typeOf = {};
 function c(t) {
-	return `${t} is required, actual value was undefined`;
+  return `${t} is required, actual value was undefined`;
 }
 function a(t, e, o) {
-	return `Expected ${o} to be typeof ${e}, actual typeof was ${t}`;
+  return `Expected ${o} to be typeof ${e}, actual typeof was ${t}`;
 }
 n.defined = (t, e) => {
-	if (!u(e)) throw new r(c(t));
+  if (!u(e)) throw new r(c(t));
 };
 n.typeOf.func = (t, e) => {
-	if (typeof e != "function") throw new r(a(typeof e, "function", t));
+  if (typeof e != 'function') throw new r(a(typeof e, 'function', t));
 };
 n.typeOf.string = (t, e) => {
-	if (typeof e != "string") throw new r(a(typeof e, "string", t));
+  if (typeof e != 'string') throw new r(a(typeof e, 'string', t));
 };
 n.typeOf.number = (t, e) => {
-	if (typeof e != "number") throw new r(a(typeof e, "number", t));
+  if (typeof e != 'number') throw new r(a(typeof e, 'number', t));
 };
 n.typeOf.number.lessThan = (t, e, o) => {
-	if ((n.typeOf.number(t, e), e >= o))
-		throw new r(`Expected ${t} to be less than ${o}, actual value was ${e}`);
+  if ((n.typeOf.number(t, e), e >= o))
+    throw new r(`Expected ${t} to be less than ${o}, actual value was ${e}`);
 };
 n.typeOf.number.lessThanOrEquals = (t, e, o) => {
-	if ((n.typeOf.number(t, e), e > o))
-		throw new r(
-			`Expected ${t} to be less than or equal to ${o}, actual value was ${e}`,
-		);
+  if ((n.typeOf.number(t, e), e > o))
+    throw new r(
+      `Expected ${t} to be less than or equal to ${o}, actual value was ${e}`,
+    );
 };
 n.typeOf.number.greaterThan = (t, e, o) => {
-	if ((n.typeOf.number(t, e), e <= o))
-		throw new r(`Expected ${t} to be greater than ${o}, actual value was ${e}`);
+  if ((n.typeOf.number(t, e), e <= o))
+    throw new r(`Expected ${t} to be greater than ${o}, actual value was ${e}`);
 };
 n.typeOf.number.greaterThanOrEquals = (t, e, o) => {
-	if ((n.typeOf.number(t, e), e < o))
-		throw new r(
-			`Expected ${t} to be greater than or equal to ${o}, actual value was ${e}`,
-		);
+  if ((n.typeOf.number(t, e), e < o))
+    throw new r(
+      `Expected ${t} to be greater than or equal to ${o}, actual value was ${e}`,
+    );
 };
 n.typeOf.object = (t, e) => {
-	if (typeof e != "object") throw new r(a(typeof e, "object", t));
+  if (typeof e != 'object') throw new r(a(typeof e, 'object', t));
 };
 n.typeOf.bool = (t, e) => {
-	if (typeof e != "boolean") throw new r(a(typeof e, "boolean", t));
+  if (typeof e != 'boolean') throw new r(a(typeof e, 'boolean', t));
 };
 n.typeOf.bigint = (t, e) => {
-	if (typeof e != "bigint") throw new r(a(typeof e, "bigint", t));
+  if (typeof e != 'bigint') throw new r(a(typeof e, 'bigint', t));
 };
 n.typeOf.number.equals = (t, e, o, i) => {
-	if ((n.typeOf.number(t, o), n.typeOf.number(e, i), o !== i))
-		throw new r(
-			`${t} must be equal to ${e}, the actual values are ${o} and ${i}`,
-		);
+  if ((n.typeOf.number(t, o), n.typeOf.number(e, i), o !== i))
+    throw new r(
+      `${t} must be equal to ${e}, the actual values are ${o} and ${i}`,
+    );
 };
 var l = n;
 export { r as a, l as b };

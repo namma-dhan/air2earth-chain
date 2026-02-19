@@ -22,312 +22,312 @@
  * Portions licensed separately.
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
-import { a as h } from "./chunk-3XRQCEHV.js";
-import { k as S } from "./chunk-4JSGO3Z7.js";
-import { e as b } from "./chunk-4TAASUQ2.js";
-import { a as y } from "./chunk-54IT5KT4.js";
-import { a as C, b as x } from "./chunk-TODZU3UG.js";
-import { a as w, b as z } from "./chunk-V62DYOIH.js";
-import { b as a, a as u } from "./chunk-VIWNLE3Z.js";
-import { b as T } from "./chunk-WV2SHQ7E.js";
+import { a as h } from './chunk-3XRQCEHV.js';
+import { k as S } from './chunk-4JSGO3Z7.js';
+import { e as b } from './chunk-4TAASUQ2.js';
+import { a as y } from './chunk-54IT5KT4.js';
+import { a as C, b as x } from './chunk-TODZU3UG.js';
+import { a as w, b as z } from './chunk-V62DYOIH.js';
+import { b as a, a as u } from './chunk-VIWNLE3Z.js';
+import { b as T } from './chunk-WV2SHQ7E.js';
 
 var c = {
-	SCALAR: "SCALAR",
-	VEC2: "VEC2",
-	VEC3: "VEC3",
-	VEC4: "VEC4",
-	MAT2: "MAT2",
-	MAT3: "MAT3",
-	MAT4: "MAT4",
+  SCALAR: 'SCALAR',
+  VEC2: 'VEC2',
+  VEC3: 'VEC3',
+  VEC4: 'VEC4',
+  MAT2: 'MAT2',
+  MAT3: 'MAT3',
+  MAT4: 'MAT4',
 };
 c.getMathType = (e) => {
-	switch (e) {
-		case c.SCALAR:
-			return Number;
-		case c.VEC2:
-			return T;
-		case c.VEC3:
-			return C;
-		case c.VEC4:
-			return w;
-		case c.MAT2:
-			return S;
-		case c.MAT3:
-			return x;
-		case c.MAT4:
-			return z;
-		default:
-			throw new u("attributeType is not a valid value.");
-	}
+  switch (e) {
+    case c.SCALAR:
+      return Number;
+    case c.VEC2:
+      return T;
+    case c.VEC3:
+      return C;
+    case c.VEC4:
+      return w;
+    case c.MAT2:
+      return S;
+    case c.MAT3:
+      return x;
+    case c.MAT4:
+      return z;
+    default:
+      throw new u('attributeType is not a valid value.');
+  }
 };
 c.getNumberOfComponents = (e) => {
-	switch (e) {
-		case c.SCALAR:
-			return 1;
-		case c.VEC2:
-			return 2;
-		case c.VEC3:
-			return 3;
-		case c.VEC4:
-		case c.MAT2:
-			return 4;
-		case c.MAT3:
-			return 9;
-		case c.MAT4:
-			return 16;
-		default:
-			throw new u("attributeType is not a valid value.");
-	}
+  switch (e) {
+    case c.SCALAR:
+      return 1;
+    case c.VEC2:
+      return 2;
+    case c.VEC3:
+      return 3;
+    case c.VEC4:
+    case c.MAT2:
+      return 4;
+    case c.MAT3:
+      return 9;
+    case c.MAT4:
+      return 16;
+    default:
+      throw new u('attributeType is not a valid value.');
+  }
 };
 c.getAttributeLocationCount = (e) => {
-	switch (e) {
-		case c.SCALAR:
-		case c.VEC2:
-		case c.VEC3:
-		case c.VEC4:
-			return 1;
-		case c.MAT2:
-			return 2;
-		case c.MAT3:
-			return 3;
-		case c.MAT4:
-			return 4;
-		default:
-			throw new u("attributeType is not a valid value.");
-	}
+  switch (e) {
+    case c.SCALAR:
+    case c.VEC2:
+    case c.VEC3:
+    case c.VEC4:
+      return 1;
+    case c.MAT2:
+      return 2;
+    case c.MAT3:
+      return 3;
+    case c.MAT4:
+      return 4;
+    default:
+      throw new u('attributeType is not a valid value.');
+  }
 };
 c.getGlslType = (e) => {
-	switch ((a.typeOf.string("attributeType", e), e)) {
-		case c.SCALAR:
-			return "float";
-		case c.VEC2:
-			return "vec2";
-		case c.VEC3:
-			return "vec3";
-		case c.VEC4:
-			return "vec4";
-		case c.MAT2:
-			return "mat2";
-		case c.MAT3:
-			return "mat3";
-		case c.MAT4:
-			return "mat4";
-		default:
-			throw new u("attributeType is not a valid value.");
-	}
+  switch ((a.typeOf.string('attributeType', e), e)) {
+    case c.SCALAR:
+      return 'float';
+    case c.VEC2:
+      return 'vec2';
+    case c.VEC3:
+      return 'vec3';
+    case c.VEC4:
+      return 'vec4';
+    case c.MAT2:
+      return 'mat2';
+    case c.MAT3:
+      return 'mat3';
+    case c.MAT4:
+      return 'mat4';
+    default:
+      throw new u('attributeType is not a valid value.');
+  }
 };
 var N = Object.freeze(c);
 var V = 1 / 256,
-	D = 256,
-	r = {};
+  D = 256,
+  r = {};
 r.octEncodeInRange = (e, t, n) => {
-	a.defined("vector", e), a.defined("result", n);
-	const o = C.magnitudeSquared(e);
-	if (Math.abs(o - 1) > h.EPSILON6) throw new u("vector must be normalized.");
-	if (
-		((n.x = e.x / (Math.abs(e.x) + Math.abs(e.y) + Math.abs(e.z))),
-		(n.y = e.y / (Math.abs(e.x) + Math.abs(e.y) + Math.abs(e.z))),
-		e.z < 0)
-	) {
-		const i = n.x,
-			d = n.y;
-		(n.x = (1 - Math.abs(d)) * h.signNotZero(i)),
-			(n.y = (1 - Math.abs(i)) * h.signNotZero(d));
-	}
-	return (n.x = h.toSNorm(n.x, t)), (n.y = h.toSNorm(n.y, t)), n;
+  a.defined('vector', e), a.defined('result', n);
+  const o = C.magnitudeSquared(e);
+  if (Math.abs(o - 1) > h.EPSILON6) throw new u('vector must be normalized.');
+  if (
+    ((n.x = e.x / (Math.abs(e.x) + Math.abs(e.y) + Math.abs(e.z))),
+    (n.y = e.y / (Math.abs(e.x) + Math.abs(e.y) + Math.abs(e.z))),
+    e.z < 0)
+  ) {
+    const i = n.x,
+      d = n.y;
+    (n.x = (1 - Math.abs(d)) * h.signNotZero(i)),
+      (n.y = (1 - Math.abs(i)) * h.signNotZero(d));
+  }
+  return (n.x = h.toSNorm(n.x, t)), (n.y = h.toSNorm(n.y, t)), n;
 };
 r.octEncode = (e, t) => r.octEncodeInRange(e, 255, t);
 var A = new T(),
-	F = new Uint8Array(1);
+  F = new Uint8Array(1);
 function E(e) {
-	return (F[0] = e), F[0];
+  return (F[0] = e), F[0];
 }
 r.octEncodeToCartesian4 = (e, t) => (
-	r.octEncodeInRange(e, 65535, A),
-	(t.x = E(A.x * V)),
-	(t.y = E(A.x)),
-	(t.z = E(A.y * V)),
-	(t.w = E(A.y)),
-	t
+  r.octEncodeInRange(e, 65535, A),
+  (t.x = E(A.x * V)),
+  (t.y = E(A.x)),
+  (t.z = E(A.y * V)),
+  (t.w = E(A.y)),
+  t
 );
 r.octDecodeInRange = (e, t, n, o) => {
-	if ((a.defined("result", o), e < 0 || e > n || t < 0 || t > n))
-		throw new u(
-			`x and y must be unsigned normalized integers between 0 and ${n}`,
-		);
-	if (
-		((o.x = h.fromSNorm(e, n)),
-		(o.y = h.fromSNorm(t, n)),
-		(o.z = 1 - (Math.abs(o.x) + Math.abs(o.y))),
-		o.z < 0)
-	) {
-		const i = o.x;
-		(o.x = (1 - Math.abs(o.y)) * h.signNotZero(i)),
-			(o.y = (1 - Math.abs(i)) * h.signNotZero(o.y));
-	}
-	return C.normalize(o, o);
+  if ((a.defined('result', o), e < 0 || e > n || t < 0 || t > n))
+    throw new u(
+      `x and y must be unsigned normalized integers between 0 and ${n}`,
+    );
+  if (
+    ((o.x = h.fromSNorm(e, n)),
+    (o.y = h.fromSNorm(t, n)),
+    (o.z = 1 - (Math.abs(o.x) + Math.abs(o.y))),
+    o.z < 0)
+  ) {
+    const i = o.x;
+    (o.x = (1 - Math.abs(o.y)) * h.signNotZero(i)),
+      (o.y = (1 - Math.abs(i)) * h.signNotZero(o.y));
+  }
+  return C.normalize(o, o);
 };
 r.octDecode = (e, t, n) => r.octDecodeInRange(e, t, 255, n);
 r.octDecodeFromCartesian4 = (e, t) => {
-	a.typeOf.object("encoded", e), a.typeOf.object("result", t);
-	const n = e.x,
-		o = e.y,
-		i = e.z,
-		d = e.w;
-	if (
-		n < 0 ||
-		n > 255 ||
-		o < 0 ||
-		o > 255 ||
-		i < 0 ||
-		i > 255 ||
-		d < 0 ||
-		d > 255
-	)
-		throw new u(
-			"x, y, z, and w must be unsigned normalized integers between 0 and 255",
-		);
-	const f = n * D + o,
-		s = i * D + d;
-	return r.octDecodeInRange(f, s, 65535, t);
+  a.typeOf.object('encoded', e), a.typeOf.object('result', t);
+  const n = e.x,
+    o = e.y,
+    i = e.z,
+    d = e.w;
+  if (
+    n < 0 ||
+    n > 255 ||
+    o < 0 ||
+    o > 255 ||
+    i < 0 ||
+    i > 255 ||
+    d < 0 ||
+    d > 255
+  )
+    throw new u(
+      'x, y, z, and w must be unsigned normalized integers between 0 and 255',
+    );
+  const f = n * D + o,
+    s = i * D + d;
+  return r.octDecodeInRange(f, s, 65535, t);
 };
-r.octPackFloat = (e) => (a.defined("encoded", e), 256 * e.x + e.y);
+r.octPackFloat = (e) => (a.defined('encoded', e), 256 * e.x + e.y);
 var l = new T();
 r.octEncodeFloat = (e) => (r.octEncode(e, l), r.octPackFloat(l));
 r.octDecodeFloat = (e, t) => {
-	a.defined("value", e);
-	const n = e / 256,
-		o = Math.floor(n),
-		i = (n - o) * 256;
-	return r.octDecode(o, i, t);
+  a.defined('value', e);
+  const n = e / 256,
+    o = Math.floor(n),
+    i = (n - o) * 256;
+  return r.octDecode(o, i, t);
 };
 r.octPack = (e, t, n, o) => {
-	a.defined("v1", e),
-		a.defined("v2", t),
-		a.defined("v3", n),
-		a.defined("result", o);
-	const i = r.octEncodeFloat(e),
-		d = r.octEncodeFloat(t),
-		f = r.octEncode(n, l);
-	return (o.x = 65536 * f.x + i), (o.y = 65536 * f.y + d), o;
+  a.defined('v1', e),
+    a.defined('v2', t),
+    a.defined('v3', n),
+    a.defined('result', o);
+  const i = r.octEncodeFloat(e),
+    d = r.octEncodeFloat(t),
+    f = r.octEncode(n, l);
+  return (o.x = 65536 * f.x + i), (o.y = 65536 * f.y + d), o;
 };
 r.octUnpack = (e, t, n, o) => {
-	a.defined("packed", e),
-		a.defined("v1", t),
-		a.defined("v2", n),
-		a.defined("v3", o);
-	let i = e.x / 65536,
-		d = Math.floor(i),
-		f = (i - d) * 65536;
-	i = e.y / 65536;
-	const s = Math.floor(i),
-		m = (i - s) * 65536;
-	r.octDecodeFloat(f, t), r.octDecodeFloat(m, n), r.octDecode(d, s, o);
+  a.defined('packed', e),
+    a.defined('v1', t),
+    a.defined('v2', n),
+    a.defined('v3', o);
+  let i = e.x / 65536,
+    d = Math.floor(i),
+    f = (i - d) * 65536;
+  i = e.y / 65536;
+  const s = Math.floor(i),
+    m = (i - s) * 65536;
+  r.octDecodeFloat(f, t), r.octDecodeFloat(m, n), r.octDecode(d, s, o);
 };
 r.compressTextureCoordinates = (e) => {
-	a.defined("textureCoordinates", e);
-	const t = (e.x * 4095) | 0,
-		n = (e.y * 4095) | 0;
-	return 4096 * t + n;
+  a.defined('textureCoordinates', e);
+  const t = (e.x * 4095) | 0,
+    n = (e.y * 4095) | 0;
+  return 4096 * t + n;
 };
 r.decompressTextureCoordinates = (e, t) => {
-	a.defined("compressed", e), a.defined("result", t);
-	const n = e / 4096,
-		o = Math.floor(n);
-	return (t.x = o / 4095), (t.y = (e - o * 4096) / 4095), t;
+  a.defined('compressed', e), a.defined('result', t);
+  const n = e / 4096,
+    o = Math.floor(n);
+  return (t.x = o / 4095), (t.y = (e - o * 4096) / 4095), t;
 };
 function g(e) {
-	return (e >> 1) ^ -(e & 1);
+  return (e >> 1) ^ -(e & 1);
 }
 r.zigZagDeltaDecode = (e, t, n) => {
-	a.defined("uBuffer", e),
-		a.defined("vBuffer", t),
-		a.typeOf.number.equals(
-			"uBuffer.length",
-			"vBuffer.length",
-			e.length,
-			t.length,
-		),
-		b(n) &&
-			a.typeOf.number.equals(
-				"uBuffer.length",
-				"heightBuffer.length",
-				e.length,
-				n.length,
-			);
-	let o = e.length,
-		i = 0,
-		d = 0,
-		f = 0;
-	for (let s = 0; s < o; ++s)
-		(i += g(e[s])),
-			(d += g(t[s])),
-			(e[s] = i),
-			(t[s] = d),
-			b(n) && ((f += g(n[s])), (n[s] = f));
+  a.defined('uBuffer', e),
+    a.defined('vBuffer', t),
+    a.typeOf.number.equals(
+      'uBuffer.length',
+      'vBuffer.length',
+      e.length,
+      t.length,
+    ),
+    b(n) &&
+      a.typeOf.number.equals(
+        'uBuffer.length',
+        'heightBuffer.length',
+        e.length,
+        n.length,
+      );
+  let o = e.length,
+    i = 0,
+    d = 0,
+    f = 0;
+  for (let s = 0; s < o; ++s)
+    (i += g(e[s])),
+      (d += g(t[s])),
+      (e[s] = i),
+      (t[s] = d),
+      b(n) && ((f += g(n[s])), (n[s] = f));
 };
 r.dequantize = (e, t, n, o) => {
-	a.defined("typedArray", e),
-		a.defined("componentDatatype", t),
-		a.defined("type", n),
-		a.defined("count", o);
-	let i = N.getNumberOfComponents(n),
-		d;
-	switch (t) {
-		case y.BYTE:
-			d = 127;
-			break;
-		case y.UNSIGNED_BYTE:
-			d = 255;
-			break;
-		case y.SHORT:
-			d = 32767;
-			break;
-		case y.UNSIGNED_SHORT:
-			d = 65535;
-			break;
-		case y.INT:
-			d = 2147483647;
-			break;
-		case y.UNSIGNED_INT:
-			d = 4294967295;
-			break;
-		default:
-			throw new u(`Cannot dequantize component datatype: ${t}`);
-	}
-	const f = new Float32Array(o * i);
-	for (let s = 0; s < o; s++)
-		for (let m = 0; m < i; m++) {
-			const p = s * i + m;
-			f[p] = Math.max(e[p] / d, -1);
-		}
-	return f;
+  a.defined('typedArray', e),
+    a.defined('componentDatatype', t),
+    a.defined('type', n),
+    a.defined('count', o);
+  let i = N.getNumberOfComponents(n),
+    d;
+  switch (t) {
+    case y.BYTE:
+      d = 127;
+      break;
+    case y.UNSIGNED_BYTE:
+      d = 255;
+      break;
+    case y.SHORT:
+      d = 32767;
+      break;
+    case y.UNSIGNED_SHORT:
+      d = 65535;
+      break;
+    case y.INT:
+      d = 2147483647;
+      break;
+    case y.UNSIGNED_INT:
+      d = 4294967295;
+      break;
+    default:
+      throw new u(`Cannot dequantize component datatype: ${t}`);
+  }
+  const f = new Float32Array(o * i);
+  for (let s = 0; s < o; s++)
+    for (let m = 0; m < i; m++) {
+      const p = s * i + m;
+      f[p] = Math.max(e[p] / d, -1);
+    }
+  return f;
 };
 r.decodeRGB565 = (e, t) => {
-	a.defined("typedArray", e);
-	const n = e.length * 3;
-	b(t) &&
-		a.typeOf.number.equals(
-			"result.length",
-			"typedArray.length * 3",
-			t.length,
-			n,
-		);
-	const o = e.length;
-	b(t) || (t = new Float32Array(o * 3));
-	const i = 31,
-		d = 63,
-		f = 1 / 31,
-		s = 1 / 63;
-	for (let m = 0; m < o; m++) {
-		const p = e[m],
-			R = p >> 11,
-			I = (p >> 5) & d,
-			O = p & i,
-			M = 3 * m;
-		(t[M] = R * f), (t[M + 1] = I * s), (t[M + 2] = O * f);
-	}
-	return t;
+  a.defined('typedArray', e);
+  const n = e.length * 3;
+  b(t) &&
+    a.typeOf.number.equals(
+      'result.length',
+      'typedArray.length * 3',
+      t.length,
+      n,
+    );
+  const o = e.length;
+  b(t) || (t = new Float32Array(o * 3));
+  const i = 31,
+    d = 63,
+    f = 1 / 31,
+    s = 1 / 63;
+  for (let m = 0; m < o; m++) {
+    const p = e[m],
+      R = p >> 11,
+      I = (p >> 5) & d,
+      O = p & i,
+      M = 3 * m;
+    (t[M] = R * f), (t[M + 1] = I * s), (t[M + 2] = O * f);
+  }
+  return t;
 };
 var W = r;
 export { W as a };

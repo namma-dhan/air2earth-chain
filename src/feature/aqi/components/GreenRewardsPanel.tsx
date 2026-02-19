@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface RewardsState {
-	points: number;
-	totalPointsIssued: number;
-	totalActions: number;
-	appId: number;
-	loading: boolean;
-	error: string | null;
-	lastUpdated: string | null;
+  points: number;
+  totalPointsIssued: number;
+  totalActions: number;
+  appId: number;
+  loading: boolean;
+  error: string | null;
+  lastUpdated: string | null;
 }
 
 interface GreenRewardsPanelProps {
-	/** Algorand address / user ID to look up */
-	userId?: string;
-	/** Fires whenever a new tree is planted, to trigger a refresh */
-	refreshTrigger?: number;
+  /** Algorand address / user ID to look up */
+  userId?: string;
+  /** Fires whenever a new tree is planted, to trigger a refresh */
+  refreshTrigger?: number;
 }
 
 /**
@@ -27,123 +27,123 @@ interface GreenRewardsPanelProps {
  * from the GreenRewards smart contract on Algorand (App ID from env).
  */
 export const GreenRewardsPanel: React.FC<GreenRewardsPanelProps> = ({
-	userId,
-	refreshTrigger = 0,
+  userId,
+  refreshTrigger = 0,
 }) => {
-	const [state, setState] = useState<RewardsState>({
-		points: 0,
-		totalPointsIssued: 0,
-		totalActions: 0,
-		appId: 0,
-		loading: true,
-		error: null,
-		lastUpdated: null,
-	});
+  const [state, setState] = useState<RewardsState>({
+    points: 0,
+    totalPointsIssued: 0,
+    totalActions: 0,
+    appId: 0,
+    loading: true,
+    error: null,
+    lastUpdated: null,
+  });
 
-	const [isExpanded, setIsExpanded] = useState(false);
-	const [isAnimating, setIsAnimating] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-	const fetchRewards = useCallback(async () => {
-		try {
-			setState((prev) => ({ ...prev, loading: true, error: null }));
+  const fetchRewards = useCallback(async () => {
+    try {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
 
-			const server = process.env.NEXT_PUBLIC_ALGOD_SERVER || "http://localhost";
-			const port = process.env.NEXT_PUBLIC_ALGOD_PORT || "4001";
-			const token = process.env.NEXT_PUBLIC_ALGOD_TOKEN || "";
-			const appId = parseInt(process.env.NEXT_PUBLIC_REWARDS_APP_ID || "0");
+      const server = process.env.NEXT_PUBLIC_ALGOD_SERVER || 'http://localhost';
+      const port = process.env.NEXT_PUBLIC_ALGOD_PORT || '4001';
+      const token = process.env.NEXT_PUBLIC_ALGOD_TOKEN || '';
+      const appId = parseInt(process.env.NEXT_PUBLIC_REWARDS_APP_ID || '0');
 
-			if (!appId) {
-				setState((prev) => ({
-					...prev,
-					loading: false,
-					error: "Rewards App ID not configured",
-				}));
-				return;
-			}
+      if (!appId) {
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Rewards App ID not configured',
+        }));
+        return;
+      }
 
-			const base = `${server}:${port}`;
-			const headers = { "X-Algo-API-Token": token };
+      const base = `${server}:${port}`;
+      const headers = { 'X-Algo-API-Token': token };
 
-			// Fetch global state
-			const appRes = await fetch(`${base}/v2/applications/${appId}`, {
-				headers,
-			});
-			if (!appRes.ok) throw new Error(`App ${appId} not found`);
-			const appData = await appRes.json();
+      // Fetch global state
+      const appRes = await fetch(`${base}/v2/applications/${appId}`, {
+        headers,
+      });
+      if (!appRes.ok) throw new Error(`App ${appId} not found`);
+      const appData = await appRes.json();
 
-			const globalState: Record<string, number> = {};
-			for (const item of appData?.params?.["global-state"] ?? []) {
-				const key = atob(item.key);
-				globalState[key] = item.value.uint ?? 0;
-			}
+      const globalState: Record<string, number> = {};
+      for (const item of appData?.params?.['global-state'] ?? []) {
+        const key = atob(item.key);
+        globalState[key] = item.value.uint ?? 0;
+      }
 
-			// If we have a userId, fetch their box
-			let userPoints = 0;
-			if (userId) {
-				try {
-					const boxKeyRaw = "pts:" + userId;
-					const boxKeyB64 = btoa(boxKeyRaw);
-					const boxRes = await fetch(
-						`${base}/v2/applications/${appId}/box?name=b64:${encodeURIComponent(boxKeyB64)}`,
-						{ headers },
-					);
-					if (boxRes.ok) {
-						const boxData = await boxRes.json();
-						// Value is base64 encoded big-endian uint64
-						const bytes = Uint8Array.from(atob(boxData.value), (c) =>
-							c.charCodeAt(0),
-						);
-						const view = new DataView(bytes.buffer);
-						userPoints = Number(view.getBigUint64(0));
-					}
-				} catch {
-					// User has no box yet = 0 points
-					userPoints = 0;
-				}
-			}
+      // If we have a userId, fetch their box
+      let userPoints = 0;
+      if (userId) {
+        try {
+          const boxKeyRaw = 'pts:' + userId;
+          const boxKeyB64 = btoa(boxKeyRaw);
+          const boxRes = await fetch(
+            `${base}/v2/applications/${appId}/box?name=b64:${encodeURIComponent(boxKeyB64)}`,
+            { headers },
+          );
+          if (boxRes.ok) {
+            const boxData = await boxRes.json();
+            // Value is base64 encoded big-endian uint64
+            const bytes = Uint8Array.from(atob(boxData.value), (c) =>
+              c.charCodeAt(0),
+            );
+            const view = new DataView(bytes.buffer);
+            userPoints = Number(view.getBigUint64(0));
+          }
+        } catch {
+          // User has no box yet = 0 points
+          userPoints = 0;
+        }
+      }
 
-			setState({
-				points: userPoints,
-				totalPointsIssued: globalState["totalPointsIssued"] ?? 0,
-				totalActions: globalState["totalActions"] ?? 0,
-				appId,
-				loading: false,
-				error: null,
-				lastUpdated: new Date().toLocaleTimeString("en-IN", {
-					hour: "2-digit",
-					minute: "2-digit",
-					second: "2-digit",
-				}),
-			});
+      setState({
+        points: userPoints,
+        totalPointsIssued: globalState['totalPointsIssued'] ?? 0,
+        totalActions: globalState['totalActions'] ?? 0,
+        appId,
+        loading: false,
+        error: null,
+        lastUpdated: new Date().toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+      });
 
-			// Animate points counter on update
-			setIsAnimating(true);
-			setTimeout(() => setIsAnimating(false), 600);
-		} catch (err: any) {
-			setState((prev) => ({
-				...prev,
-				loading: false,
-				error: err.message || "Could not reach Algorand node",
-			}));
-		}
-	}, [userId]);
+      // Animate points counter on update
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 600);
+    } catch (err: any) {
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: err.message || 'Could not reach Algorand node',
+      }));
+    }
+  }, [userId]);
 
-	// Fetch on mount and when refreshTrigger changes (tree planted)
-	useEffect(() => {
-		fetchRewards();
-	}, [fetchRewards, refreshTrigger]);
+  // Fetch on mount and when refreshTrigger changes (tree planted)
+  useEffect(() => {
+    fetchRewards();
+  }, [fetchRewards, refreshTrigger]);
 
-	// Auto-refresh every 15 seconds
-	useEffect(() => {
-		const interval = setInterval(fetchRewards, 15000);
-		return () => clearInterval(interval);
-	}, [fetchRewards]);
+  // Auto-refresh every 15 seconds
+  useEffect(() => {
+    const interval = setInterval(fetchRewards, 15000);
+    return () => clearInterval(interval);
+  }, [fetchRewards]);
 
-	const loraUrl = `https://lora.algokit.io/localnet/application/${state.appId}`;
+  const loraUrl = `https://lora.algokit.io/localnet/application/${state.appId}`;
 
-	return (
-		<>
-			<style>{`
+  return (
+    <>
+      <style>{`
         .gr-panel {
           position: fixed;
           top: 90px;
@@ -365,96 +365,96 @@ export const GreenRewardsPanel: React.FC<GreenRewardsPanelProps> = ({
         }
       `}</style>
 
-			<div className="gr-panel">
-				{/* Collapsed badge — always visible */}
-				<div className="gr-badge" onClick={() => setIsExpanded((e) => !e)}>
-					<div className="gr-leaf">🌿</div>
+      <div className="gr-panel">
+        {/* Collapsed badge — always visible */}
+        <div className="gr-badge" onClick={() => setIsExpanded((e) => !e)}>
+          <div className="gr-leaf">🌿</div>
 
-					<div className="gr-badge-info">
-						<div className="gr-label">Green Points</div>
-						{state.loading ? (
-							<div className="gr-loading-dot" />
-						) : state.error ? (
-							<div style={{ fontSize: 11, color: "#f87171" }}>Offline</div>
-						) : (
-							<>
-								<div className={`gr-points ${isAnimating ? "animating" : ""}`}>
-									{state.points.toLocaleString()}
-								</div>
-								<div className="gr-pts-label">pts on Algorand</div>
-							</>
-						)}
-					</div>
+          <div className="gr-badge-info">
+            <div className="gr-label">Green Points</div>
+            {state.loading ? (
+              <div className="gr-loading-dot" />
+            ) : state.error ? (
+              <div style={{ fontSize: 11, color: '#f87171' }}>Offline</div>
+            ) : (
+              <>
+                <div className={`gr-points ${isAnimating ? 'animating' : ''}`}>
+                  {state.points.toLocaleString()}
+                </div>
+                <div className="gr-pts-label">pts on Algorand</div>
+              </>
+            )}
+          </div>
 
-					<div className={`gr-chevron ${isExpanded ? "open" : ""}`}>▼</div>
-				</div>
+          <div className={`gr-chevron ${isExpanded ? 'open' : ''}`}>▼</div>
+        </div>
 
-				{/* Expanded details panel */}
-				{isExpanded && (
-					<div className="gr-expanded">
-						{state.error ? (
-							<div className="gr-error">⚠ {state.error}</div>
-						) : (
-							<>
-								{/* My balance */}
-								{userId ? (
-									<div className="gr-stat-row">
-										<span className="gr-stat-label">🎯 My balance</span>
-										<span className="gr-stat-value green">
-											{state.points.toLocaleString()} pts
-										</span>
-									</div>
-								) : (
-									<div className="gr-no-wallet">
-										Plant a tree to earn points!
-									</div>
-								)}
+        {/* Expanded details panel */}
+        {isExpanded && (
+          <div className="gr-expanded">
+            {state.error ? (
+              <div className="gr-error">⚠ {state.error}</div>
+            ) : (
+              <>
+                {/* My balance */}
+                {userId ? (
+                  <div className="gr-stat-row">
+                    <span className="gr-stat-label">🎯 My balance</span>
+                    <span className="gr-stat-value green">
+                      {state.points.toLocaleString()} pts
+                    </span>
+                  </div>
+                ) : (
+                  <div className="gr-no-wallet">
+                    Plant a tree to earn points!
+                  </div>
+                )}
 
-								<div className="gr-divider" />
+                <div className="gr-divider" />
 
-								{/* Global stats */}
-								<div className="gr-stat-row">
-									<span className="gr-stat-label">🌍 Total issued</span>
-									<span className="gr-stat-value">
-										{state.totalPointsIssued.toLocaleString()} pts
-									</span>
-								</div>
-								<div className="gr-stat-row">
-									<span className="gr-stat-label">🌱 Actions recorded</span>
-									<span className="gr-stat-value">{state.totalActions}</span>
-								</div>
-								<div className="gr-stat-row">
-									<span className="gr-stat-label">🔗 Contract ID</span>
-									<span className="gr-stat-value">App {state.appId}</span>
-								</div>
+                {/* Global stats */}
+                <div className="gr-stat-row">
+                  <span className="gr-stat-label">🌍 Total issued</span>
+                  <span className="gr-stat-value">
+                    {state.totalPointsIssued.toLocaleString()} pts
+                  </span>
+                </div>
+                <div className="gr-stat-row">
+                  <span className="gr-stat-label">🌱 Actions recorded</span>
+                  <span className="gr-stat-value">{state.totalActions}</span>
+                </div>
+                <div className="gr-stat-row">
+                  <span className="gr-stat-label">🔗 Contract ID</span>
+                  <span className="gr-stat-value">App {state.appId}</span>
+                </div>
 
-								<div className="gr-divider" />
+                <div className="gr-divider" />
 
-								{/* Lora link */}
-								<a
-									className="gr-chain-badge"
-									href={loraUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									<span className="gr-dot" />
-									LIVE ON ALGORAND — VIEW ON LORA ↗
-								</a>
+                {/* Lora link */}
+                <a
+                  className="gr-chain-badge"
+                  href={loraUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="gr-dot" />
+                  LIVE ON ALGORAND — VIEW ON LORA ↗
+                </a>
 
-								<button className="gr-refresh-btn" onClick={fetchRewards}>
-									↺ Refresh Balance
-								</button>
+                <button className="gr-refresh-btn" onClick={fetchRewards}>
+                  ↺ Refresh Balance
+                </button>
 
-								{state.lastUpdated && (
-									<div className="gr-updated">Updated {state.lastUpdated}</div>
-								)}
-							</>
-						)}
-					</div>
-				)}
-			</div>
-		</>
-	);
+                {state.lastUpdated && (
+                  <div className="gr-updated">Updated {state.lastUpdated}</div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
 };
 
 export default GreenRewardsPanel;

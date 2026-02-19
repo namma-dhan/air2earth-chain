@@ -1,7 +1,7 @@
-import AqiCesiumApp from "./AqiCesiumApp";
+import AqiCesiumApp from './AqiCesiumApp';
 
 const AqiPage = () => {
-	return <AqiCesiumApp />;
+  return <AqiCesiumApp />;
 };
 
 export default AqiPage;

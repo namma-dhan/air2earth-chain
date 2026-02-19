@@ -1,8 +1,8 @@
 {
-	"appId": 755799085,
-	"appAddress": "TJFQMMJBAAAM5LT5UAGGRMMRZD3X7VTGRGJ5ISDP4JN45YVH44RG6A6HQA",
-	"network": "localnet",
-	"algodServer": "https://testnet-api.algonode.cloud",
-	"algodPort": 443,
-	"algodToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  "appId": 755799085,
+  "appAddress": "TJFQMMJBAAAM5LT5UAGGRMMRZD3X7VTGRGJ5ISDP4JN45YVH44RG6A6HQA",
+  "network": "localnet",
+  "algodServer": "https://testnet-api.algonode.cloud",
+  "algodPort": 443,
+  "algodToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 }

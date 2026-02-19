@@ -23,52 +23,52 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-import { e as f } from "./chunk-4TAASUQ2.js";
+import { e as f } from './chunk-4TAASUQ2.js';
 
 function c(t) {
-	let n,
-		a = t.name,
-		e = t.message;
-	f(a) && f(e) ? (n = `${a}: ${e}`) : (n = t.toString());
-	const o = t.stack;
-	return (
-		f(o) &&
-			(n += `
+  let n,
+    a = t.name,
+    e = t.message;
+  f(a) && f(e) ? (n = `${a}: ${e}`) : (n = t.toString());
+  const o = t.stack;
+  return (
+    f(o) &&
+      (n += `
 ${o}`),
-		n
-	);
+    n
+  );
 }
 var i = c;
 function l(t) {
-	async function n({ data: e }) {
-		const o = [],
-			s = { id: e.id, result: void 0, error: void 0 };
-		self.CESIUM_BASE_URL = e.baseUrl;
-		try {
-			const r = await t(e.parameters, o);
-			s.result = r;
-		} catch (r) {
-			r instanceof Error
-				? (s.error = { name: r.name, message: r.message, stack: r.stack })
-				: (s.error = r);
-		}
-		e.canTransferArrayBuffer || (o.length = 0);
-		try {
-			postMessage(s, o);
-		} catch (r) {
-			(s.result = void 0),
-				(s.error = `postMessage failed with error: ${i(r)}
+  async function n({ data: e }) {
+    const o = [],
+      s = { id: e.id, result: void 0, error: void 0 };
+    self.CESIUM_BASE_URL = e.baseUrl;
+    try {
+      const r = await t(e.parameters, o);
+      s.result = r;
+    } catch (r) {
+      r instanceof Error
+        ? (s.error = { name: r.name, message: r.message, stack: r.stack })
+        : (s.error = r);
+    }
+    e.canTransferArrayBuffer || (o.length = 0);
+    try {
+      postMessage(s, o);
+    } catch (r) {
+      (s.result = void 0),
+        (s.error = `postMessage failed with error: ${i(r)}
   with responseMessage: ${JSON.stringify(s)}`),
-				postMessage(s);
-		}
-	}
-	function a(e) {
-		postMessage({
-			id: e.data?.id,
-			error: `postMessage failed with error: ${JSON.stringify(e)}`,
-		});
-	}
-	return (self.onmessage = n), (self.onmessageerror = a), self;
+        postMessage(s);
+    }
+  }
+  function a(e) {
+    postMessage({
+      id: e.data?.id,
+      error: `postMessage failed with error: ${JSON.stringify(e)}`,
+    });
+  }
+  return (self.onmessage = n), (self.onmessageerror = a), self;
 }
 var d = l;
 export { d as a };
