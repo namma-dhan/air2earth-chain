@@ -1,16 +1,59 @@
-# 🌍 AeroEarth: On-Chain Earth Intelligence
 
-<div align="center">
-  <!-- TODO: Drop your banner image here -->
-  <img src="./public/banner-placeholder.png" alt="AeroEarth Banner" width="100%" />
-</div>
+<h2 align="center">
+  <img src="ascii-art-text.png" alt="AeroEarth Header" width="700"/>
+</h2>
 
-## 📌 The Vision
-**AeroEarth** is where environmental action meets blockchain truth. It’s a 3D digital twin of our planet that lets you visualize live air quality (AQI) data and take verifiable climate action. 
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&pause=800&color=27AE60&center=true&vCenter=true&width=800&lines=AeroEarth+%E2%80%94+Climate+%C3%97+Blockchain;3D+Earth+%7C+Green+Actions+%7C+On-Chain+Truth;Sustainable+Web3+Platform" alt="Typing SVG" />
+</p>
 
-Instead of just looking at stats, users can interact with the 3D globe to "plant" virtual trees or add green infrastructure. When you do, the platform calculates the real-world CO₂ offset and securely logs this action on the Algorand blockchain, instantly awarding you unchangeable, cryptographically verifiable "Green Points".
 
-## 🎯 The Problem We're Solving
+<p align="center">
+  <img src="https://img.shields.io/badge/blockchain-algorand-black.svg?style=flat-square&logo=algorand&logoColor=white" />
+  <img src="https://img.shields.io/badge/avm-smart_contracts-blue.svg?style=flat-square" />
+  <img src="https://img.shields.io/badge/typescript-puyats-3178C6.svg?style=flat-square&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/frontend-next.js_15-black.svg?style=flat-square&logo=nextdotjs" />
+  <img src="https://img.shields.io/badge/ui-react-61DAFB.svg?style=flat-square&logo=react&logoColor=black" />
+
+
+  <img src="https://img.shields.io/badge/3d-cesiumjs-00B3A4.svg?style=flat-square" />
+  <img src="https://img.shields.io/badge/styling-tailwindcss-38BDF8.svg?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/tooling-algokit-purple.svg?style=flat-square" />
+  <img src="https://img.shields.io/badge/explorer-lora-orange.svg?style=flat-square" />
+  <img src="https://img.shields.io/badge/backend-next.js_api_routes-black.svg?style=flat-square&logo=vercel" />
+</p>
+
+## ✨ Demo
+
+`AeroChain` Decentralized platform that connects atmospheric intelligence with Earth-scale visualization using blockchain:
+
+<!-- 🌍 Main Demo Image Full Width -->
+<p align="center">
+  <img src="demo.png" width="100%" alt="demo"/>
+</p>
+
+<!-- ☀️ Solar & 💧 Water Full Width Side by Side -->
+<p align="center">
+  <img src="solar.png" width="49%" alt="Solar Dashboard"/>
+  <img src="water.png" width="49%" alt="Water Dashboard"/>
+</p>
+
+<!-- 🌫️ AQI Section Full Width -->
+<p align="center">
+  <img src="aqi.png" width="100%" alt="AQI Dashboard"/>
+</p>
+
+
+
+<h2 align="center">🎯 The Problem We're Solving</h2>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/❌-Lack_of_Transparency-red?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/❌-Lack_of_Engagement-red?style=for-the-badge"/>
+</p>
+
+<br/>
+
 Right now, climate action suffers from two massive problems: **lack of transparency** and **lack of engagement**. 
 
 People and companies claim to plant trees or reduce emissions, but how do we *prove* it? And for the everyday user, environmental dashboards are just boring spreadsheets. 
@@ -19,14 +62,77 @@ AeroEarth fixes both:
 1. **Gamified Action:** We turn climate awareness into an immersive 3D experience using CesiumJS.
 2. **Absolute Proof:** By storing both the starting pollution data and the user's mitigation actions (carbon offsets) on-chain, we create a transparent, tamper-proof record of who is actually helping the planet.
 
-## ⚡ Why We Chose Algorand
-When building a global environmental platform, the blockchain itself needs to be green. We chose Algorand because:
-- **Carbon Negative & Fast:** Algorand is fundamentally built to be environmentally friendly (carbon negative) with sub-3-second finality. It makes zero sense to build an eco-saving dApp on an energy-hungry Proof-of-Work chain.
-- **Cheap Transactions:** Logging thousands of environmental data points and user actions requires micro-transaction fees. Algorand’s ~0.001 ALGO fee makes this economically viable.
-- **Box Storage (`BoxMap`):** We heavily utilize Algorand's Box Storage. It allows us to store unlimited map data and user profiles on-chain with O(1) read access, bypassing the need for a centralized database entirely.
-- **Algorand TypeScript (PuyaTs):** We wrote our smart contracts purely in TypeScript. The seamless DX of compiling familiar TS directly into AVM bytecode via AlgoKit was a game-changer for our development speed.
 
----
+<h2 align="center">How AeroEarth Fixes This</h2>
+
+<br/>
+
+AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
+
+1. **Gamified Climate Action:**  
+   We transform climate awareness into an immersive 3D Earth experience powered by CesiumJS. Instead of static dashboards, users interact with real-world environmental data in a dynamic and intuitive way.
+
+2. **On-Chain Transparency:**  
+   Both the baseline pollution data and user mitigation actions are stored on-chain. This creates a transparent, tamper-proof, and publicly verifiable record of measurable climate impact.
+
+<br/>
+
+
+
+
+
+
+
+<h2 align="center">⚡ Why We Chose Algorand</h2>
+
+<br/>
+
+<!-- Animated Subheading -->
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=00FFB3&center=true&vCenter=true&width=800&lines=Green+Blockchain+for+a+Green+Planet.;Speed.+Scalability.+Sustainability." />
+</p>
+
+<br/>
+
+<h3 align="center">🌱 Carbon Negative & Fast</h3>
+
+<p align="center">
+Carbon-negative blockchain with sub-3-second finality.<br/>
+Building an eco dApp on an energy-hungry chain makes zero sense.
+</p>
+
+<br/>
+
+<h3 align="center">💸 Ultra-Low Transaction Fees</h3>
+
+<p align="center">
+~0.001 ALGO per transaction — perfect for logging thousands of environmental actions.
+</p>
+
+<br/>
+
+<h3 align="center">📦 Box Storage (BoxMap)</h3>
+
+<p align="center">
+Unlimited on-chain map storage with O(1) read access.<br/>
+No centralized database required.
+</p>
+
+<br/>
+
+<h3 align="center">🧠 TypeScript Smart Contracts (PuyaTs)</h3>
+
+<p align="center">
+Smart contracts written fully in TypeScript.<br/>
+Compiled directly into AVM bytecode via AlgoKit.
+</p>
+
+<br/>
+
+<!-- Footer Wave -->
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:27AE60,100:00FFB3&height=120&section=footer"/>
+</p>
 
 ## 🔗 Live Links & Demo
 - **Live Demo URL:** [Insert Vercel/Netlify Link Here]
