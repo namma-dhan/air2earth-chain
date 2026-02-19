@@ -1,47 +1,11 @@
+# 🌍 AeroEarth: On-Chain Earth Intelligence
 
-<h2 align="center">
-  <img src="ascii-art-text.png" alt="AeroEarth Header" width="700"/>
-</h2>
+<div align="center">
+  <!-- TODO: Drop your banner image here -->
+  <img src="./public/banner-placeholder.png" alt="AeroEarth Banner" width="100%" />
+</div>
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&pause=800&color=27AE60&center=true&vCenter=true&width=800&lines=AeroEarth+%E2%80%94+Climate+%C3%97+Blockchain;3D+Earth+%7C+Green+Actions+%7C+On-Chain+Truth;Sustainable+Web3+Platform" alt="Typing SVG" />
-</p>
-
-
-<p align="center">
-  <img src="https://img.shields.io/badge/blockchain-algorand-black.svg?style=flat-square&logo=algorand&logoColor=white" />
-  <img src="https://img.shields.io/badge/avm-smart_contracts-blue.svg?style=flat-square" />
-  <img src="https://img.shields.io/badge/typescript-puyats-3178C6.svg?style=flat-square&logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/frontend-next.js_15-black.svg?style=flat-square&logo=nextdotjs" />
-  <img src="https://img.shields.io/badge/ui-react-61DAFB.svg?style=flat-square&logo=react&logoColor=black" />
-
-
-  <img src="https://img.shields.io/badge/3d-cesiumjs-00B3A4.svg?style=flat-square" />
-  <img src="https://img.shields.io/badge/styling-tailwindcss-38BDF8.svg?style=flat-square&logo=tailwindcss&logoColor=white" />
-  <img src="https://img.shields.io/badge/tooling-algokit-purple.svg?style=flat-square" />
-  <img src="https://img.shields.io/badge/explorer-lora-orange.svg?style=flat-square" />
-  <img src="https://img.shields.io/badge/backend-next.js_api_routes-black.svg?style=flat-square&logo=vercel" />
-</p>
-
-## ✨ Demo
-
-`AeroChain` Decentralized platform that connects atmospheric intelligence with Earth-scale visualization using blockchain:
-
-<p align="center">
-  <img width="700" align="center" src="" alt="demo"/>
-</p>
-
-
-<p align="center">
-  <img src="image1.png" width="300" alt="image1"/>
-  <img src="image2.png" width="300" alt="image2"/>
-</p>
-
-<p align="center">
-  <img src="image3.png" width="600" alt="image3"/>
-</p>
-
-
+## 📌 The Vision
 **AeroEarth** is where environmental action meets blockchain truth. It’s a 3D digital twin of our planet that lets you visualize live air quality (AQI) data and take verifiable climate action. 
 
 Instead of just looking at stats, users can interact with the 3D globe to "plant" virtual trees or add green infrastructure. When you do, the platform calculates the real-world CO₂ offset and securely logs this action on the Algorand blockchain, instantly awarding you unchangeable, cryptographically verifiable "Green Points".

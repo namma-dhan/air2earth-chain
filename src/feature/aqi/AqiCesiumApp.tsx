@@ -8,96 +8,33 @@ import './AqiCesium.css';
 import { Toolbox } from './components/shared/Toolbox';
 import { ImpactPopup } from './components/ImpactPopup';
 import { TotalImpactPanel } from './components/TotalImpactPanel';
+import { GreenRewardsPanel } from './components/GreenRewardsPanel';
 import { ImmersiveVRScene, VRButton } from '../../components/vr';
-import { 
-  estimateTreeImpact, 
-  estimateGardenImpact, 
-  estimatePurifierImpact, 
+import {
+  estimateTreeImpact,
+  estimateGardenImpact,
+  estimatePurifierImpact,
   calculateTotalImpact,
-  type ImpactData 
+  type ImpactData
 } from './utils/calculations';
+import {
+  fetchAqiFromBlockchain,
+  storeTreeOnBlockchain,
+  fetchTreesFromBlockchain,
+  type TreeClaimData,
+  type AqiStationRaw,
+  type BlockchainAqiResponse
+} from '../../lib/algorand/aqi-service';
 
 const ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
 // Set Cesium base URL to CDN so assets resolve correctly under webpack/Next.js
-(window as any).CESIUM_BASE_URL = '/Cesium/';
+(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
-// Station data from API - South India
-const apiResponse = {
-  "status": "ok",
-  "data": [
-    // Chennai stations
-    { "lat": 13.1036, "lon": 80.2909, "uid": 13737, "aqi": "158", "station": { "name": "Royapuram, Chennai", "time": "2026-01-29T13:30:00+09:00" } },
-    { "lat": 12.9533, "lon": 80.2357, "uid": 13738, "aqi": "154", "station": { "name": "Perungudi, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.4127, "lon": 80.1081, "uid": 13807, "aqi": "170", "station": { "name": "Anthoni Pillai Nagar, Gummidipoondi", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.164544, "lon": 80.26285, "uid": 8185, "aqi": "173", "station": { "name": "Manali, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.0052189, "lon": 80.2398125, "uid": 11279, "aqi": "159", "station": { "name": "Velachery Res. Area, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.0664, "lon": 80.2112, "uid": 13740, "aqi": "154", "station": { "name": "Arumbakkam, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.1278, "lon": 80.2642, "uid": 13739, "aqi": "157", "station": { "name": "Kodungaiyur, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.0827, "lon": 80.2707, "uid": 13741, "aqi": "145", "station": { "name": "Anna Nagar, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.0569, "lon": 80.2425, "uid": 13742, "aqi": "162", "station": { "name": "T. Nagar, Chennai", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Coimbatore stations
-    { "lat": 11.0168, "lon": 76.9558, "uid": 14001, "aqi": "78", "station": { "name": "SIDCO, Coimbatore", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 10.9925, "lon": 76.9614, "uid": 14002, "aqi": "65", "station": { "name": "RS Puram, Coimbatore", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 11.0246, "lon": 77.0028, "uid": 14003, "aqi": "72", "station": { "name": "Gandhipuram, Coimbatore", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Madurai stations
-    { "lat": 9.9252, "lon": 78.1198, "uid": 14101, "aqi": "89", "station": { "name": "Meenakshi Temple Area, Madurai", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 9.9399, "lon": 78.1213, "uid": 14102, "aqi": "95", "station": { "name": "Periyar Bus Stand, Madurai", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Trichy stations
-    { "lat": 10.7905, "lon": 78.7047, "uid": 14201, "aqi": "68", "station": { "name": "Srirangam, Trichy", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 10.8155, "lon": 78.6965, "uid": 14202, "aqi": "74", "station": { "name": "Central Bus Stand, Trichy", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Salem station
-    { "lat": 11.6643, "lon": 78.1460, "uid": 14301, "aqi": "82", "station": { "name": "Steel Plant Area, Salem", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Tirunelveli station
-    { "lat": 8.7139, "lon": 77.7567, "uid": 14401, "aqi": "45", "station": { "name": "Palayamkottai, Tirunelveli", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Vellore station
-    { "lat": 12.9165, "lon": 79.1325, "uid": 14501, "aqi": "98", "station": { "name": "CMC Area, Vellore", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Pondicherry stations
-    { "lat": 11.9416, "lon": 79.8083, "uid": 14601, "aqi": "52", "station": { "name": "White Town, Puducherry", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 11.9139, "lon": 79.8145, "uid": 14602, "aqi": "58", "station": { "name": "Lawspet, Puducherry", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Bangalore stations (Karnataka)
-    { "lat": 12.9716, "lon": 77.5946, "uid": 15001, "aqi": "112", "station": { "name": "MG Road, Bengaluru", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 12.9352, "lon": 77.6245, "uid": 15002, "aqi": "125", "station": { "name": "BTM Layout, Bengaluru", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 13.0358, "lon": 77.5970, "uid": 15003, "aqi": "118", "station": { "name": "Hebbal, Bengaluru", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 12.9141, "lon": 77.6411, "uid": 15004, "aqi": "135", "station": { "name": "Silk Board, Bengaluru", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 12.9783, "lon": 77.6408, "uid": 15005, "aqi": "108", "station": { "name": "Indiranagar, Bengaluru", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Mysore station
-    { "lat": 12.2958, "lon": 76.6394, "uid": 15101, "aqi": "55", "station": { "name": "Palace Area, Mysuru", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Hyderabad stations (Telangana)
-    { "lat": 17.3850, "lon": 78.4867, "uid": 16001, "aqi": "142", "station": { "name": "Charminar, Hyderabad", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 17.4400, "lon": 78.3489, "uid": 16002, "aqi": "128", "station": { "name": "HITEC City, Hyderabad", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 17.4239, "lon": 78.4738, "uid": 16003, "aqi": "138", "station": { "name": "Secunderabad, Hyderabad", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 17.4156, "lon": 78.4347, "uid": 16004, "aqi": "145", "station": { "name": "Kukatpally, Hyderabad", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Kochi stations (Kerala)
-    { "lat": 9.9312, "lon": 76.2673, "uid": 17001, "aqi": "42", "station": { "name": "Fort Kochi", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 9.9816, "lon": 76.2999, "uid": 17002, "aqi": "48", "station": { "name": "Ernakulam South, Kochi", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Thiruvananthapuram stations
-    { "lat": 8.5241, "lon": 76.9366, "uid": 17101, "aqi": "38", "station": { "name": "Technopark, Thiruvananthapuram", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 8.4875, "lon": 76.9525, "uid": 17102, "aqi": "35", "station": { "name": "Kovalam, Thiruvananthapuram", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Visakhapatnam stations (Andhra Pradesh)
-    { "lat": 17.6868, "lon": 83.2185, "uid": 18001, "aqi": "95", "station": { "name": "Beach Road, Visakhapatnam", "time": "2026-01-29T15:30:00+09:00" } },
-    { "lat": 17.7231, "lon": 83.3013, "uid": 18002, "aqi": "115", "station": { "name": "Steel Plant, Visakhapatnam", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Vijayawada station
-    { "lat": 16.5062, "lon": 80.6480, "uid": 18101, "aqi": "88", "station": { "name": "Benz Circle, Vijayawada", "time": "2026-01-29T15:30:00+09:00" } },
-
-    // Tirupati station
-    { "lat": 13.6288, "lon": 79.4192, "uid": 18201, "aqi": "62", "station": { "name": "Temple Area, Tirupati", "time": "2026-01-29T15:30:00+09:00" } },
-  ]
-};
+// ─────────────────────────────────────────────────────────────
+// ALL AQI DATA IS FETCHED FROM ALGORAND BLOCKCHAIN
+// No hardcoded data — 100% decentralized
+// ─────────────────────────────────────────────────────────────
 
 // Process and filter valid AQI data
 interface StationData {
@@ -110,17 +47,25 @@ interface StationData {
   position: Cesium.Cartesian3;
 }
 
-const aqiData: StationData[] = apiResponse.data
-  .filter((station) => station.aqi !== "-")
-  .map((station) => ({
-    name: station.station.name,
-    latitude: station.lat,
-    longitude: station.lon,
-    aqi: parseInt(station.aqi),
-    time: station.station.time,
-    uid: station.uid,
-    position: Cesium.Cartesian3.fromDegrees(station.lon, station.lat),
-  }));
+/**
+ * Convert raw AQI station data (from blockchain) to processed StationData format.
+ */
+function processRawData(rawData: AqiStationRaw[]): StationData[] {
+  return rawData
+    .filter((station) => station.aqi !== "-")
+    .map((station) => ({
+      name: station.station.name,
+      latitude: station.lat,
+      longitude: station.lon,
+      aqi: parseInt(station.aqi),
+      time: station.station.time,
+      uid: station.uid,
+      position: Cesium.Cartesian3.fromDegrees(station.lon, station.lat),
+    }));
+}
+
+// This will be populated from the Algorand blockchain on mount
+let aqiData: StationData[] = [];
 
 // Compute bounds from station coordinates with padding
 const computeBounds = () => {
@@ -218,7 +163,14 @@ function AqiCesiumApp() {
 
   const [popup, setPopup] = useState<PopupInfo>({ visible: false, x: 0, y: 0, station: null });
   const [viewer, setViewer] = useState<Cesium.Viewer | null>(null);
-  
+
+  // Blockchain data source state
+  const [dataSource, setDataSource] = useState<'loading' | 'algorand-blockchain' | 'error'>('loading');
+  const [blockchainAppId, setBlockchainAppId] = useState<number | null>(null);
+  const [stationCount, setStationCount] = useState<number>(0);
+  const [blockchainReady, setBlockchainReady] = useState(false);
+  const [blockchainError, setBlockchainError] = useState<string | null>(null);
+
   // Impact popup state
   const [currentImpact, setCurrentImpact] = useState<ImpactData | null>(null);
   const [impactPosition, setImpactPosition] = useState<{ x: number; y: number } | null>(null);
@@ -230,7 +182,10 @@ function AqiCesiumApp() {
   const [windDirection, setWindDirection] = useState(45); // degrees
   const [showPollution, setShowPollution] = useState(true);
   const [isVRMode, setIsVRMode] = useState(false);
-  
+
+  // Rewards — refresh trigger bumped whenever a tree is stored on-chain
+  const [treeCount, setTreeCount] = useState(0);
+
   // Refs for shader access
   const showWindRef = useRef(showWind);
   const windSpeedRef = useRef(windSpeed);
@@ -251,28 +206,56 @@ function AqiCesiumApp() {
   }, [showWind, windSpeed, windDirection, showPollution]);
 
   // Handle placement completed events from PlacementManager
-  const handlePlacementCompleted = useCallback((event: CustomEvent<{ 
-    tool: string; 
+  const handlePlacementCompleted = useCallback(async (event: CustomEvent<{
+    tool: string;
+    position?: Cesium.Cartesian3;
     screenPosition: { x: number; y: number } | null;
     areaM2?: number;
   }>) => {
-    const { tool, screenPosition, areaM2 } = event.detail;
-    
+    const { tool, screenPosition, position, areaM2 } = event.detail;
+
     let impact: ImpactData | null = null;
-    
+
     if (tool === 'tree') {
       impact = estimateTreeImpact();
+
+      // Ensure we have world coordinates to save on protocol
+      if (position) {
+        const carto = Cesium.Cartographic.fromCartesian(position);
+        const lat = Cesium.Math.toDegrees(carto.latitude);
+        const lon = Cesium.Math.toDegrees(carto.longitude);
+
+        const claimData: TreeClaimData = {
+          treeId: `tree-${Date.now()}`,
+          planter: "AeroEarth User",
+          location: { lat, lon },
+          variety: "Virtual Tree Placement",
+          plantedAt: new Date().toISOString(),
+          co2OffsetKg: impact.co2Absorbed,
+          notes: "Planted securely via AeroEarth frontend"
+        };
+
+        try {
+          // Send to our secure backend API to be certified on the blockchain
+          const result = await storeTreeOnBlockchain(claimData);
+          console.log('[AqiCesiumApp] ✅ Tree securely stored on Algorand:', result.txId);
+          // Bump treeCount to trigger rewards panel refresh
+          setTreeCount(c => c + 1);
+        } catch (e: any) {
+          console.error('[AqiCesiumApp] ❌ Failed to record on chain:', e);
+        }
+      }
     } else if (tool === 'garden') {
       impact = estimateGardenImpact(areaM2 || 15);
     } else if (tool === 'purifier') {
       impact = estimatePurifierImpact();
     }
-    
+
     if (impact) {
-      setCurrentImpact(impact);
+      setCurrentImpact(impact as ImpactData);
       setImpactPosition(screenPosition);
-      setAllImpacts(prev => [...prev, impact!]);
-      
+      setAllImpacts(prev => [...prev, impact! as ImpactData]);
+
       // Auto-hide popup after 5 seconds
       setTimeout(() => {
         setCurrentImpact(null);
@@ -283,9 +266,9 @@ function AqiCesiumApp() {
 
   // Listen for placement events
   useEffect(() => {
-    window.addEventListener('placement-completed', handlePlacementCompleted as EventListener);
+    window.addEventListener('placement-completed', handlePlacementCompleted as unknown as EventListener);
     return () => {
-      window.removeEventListener('placement-completed', handlePlacementCompleted as EventListener);
+      window.removeEventListener('placement-completed', handlePlacementCompleted as unknown as EventListener);
     };
   }, [handlePlacementCompleted]);
 
@@ -297,7 +280,7 @@ function AqiCesiumApp() {
         const v = viewerRef.current;
         // Recalculate average AQI
         const avgAqi = aqiData.reduce((sum, s) => sum + s.aqi, 0) / aqiData.length;
-        
+
         // Recreate shaders (they were removed during VR optimization)
         try {
           // Only recreate if they don't exist
@@ -443,8 +426,42 @@ function AqiCesiumApp() {
     pollutionStageRef.current = stage;
   };
 
+  // ─────────────────────────────────────────────────────────────
+  // BLOCKCHAIN DATA FETCHING
+  // Fetch AQI data from Algorand blockchain — no fallback
+  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!containerRef.current) return;
+    const loadBlockchainData = async () => {
+      try {
+        console.log('[AqiCesiumApp] 🔗 Fetching AQI data from Algorand blockchain...');
+        const response = await fetchAqiFromBlockchain();
+
+        // Update the module-level aqiData with blockchain data
+        aqiData = processRawData(response.data);
+        setDataSource('algorand-blockchain');
+        setStationCount(response.data.length);
+        setBlockchainReady(true);
+
+        if (response.appId) {
+          setBlockchainAppId(response.appId);
+        }
+
+        console.log(
+          `[AqiCesiumApp] ✅ Loaded ${response.data.length} stations from Algorand blockchain`
+        );
+      } catch (err: any) {
+        console.error('[AqiCesiumApp] ❌ Failed to fetch from blockchain:', err);
+        setDataSource('error');
+        setBlockchainError(err?.message || 'Failed to connect to Algorand blockchain');
+      }
+    };
+
+    loadBlockchainData();
+  }, []);
+
+  // Only initialize Cesium AFTER blockchain data is loaded
+  useEffect(() => {
+    if (!containerRef.current || !blockchainReady || aqiData.length === 0) return;
     let aborted = false;
 
     const initializeCesium = async () => {
@@ -778,15 +795,118 @@ function AqiCesiumApp() {
       }
       viewerRef.current = null;
     };
-  }, []);
+  }, [blockchainReady]);
 
   const closePopup = () => {
     setPopup({ visible: false, x: 0, y: 0, station: null });
   };
 
+  // ─── Loading State: Waiting for blockchain data ───
+  if (dataSource === 'loading') {
+    return (
+      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0e1a', color: '#fff', fontFamily: 'monospace' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 48, marginBottom: 20, animation: 'pulse 1.5s infinite' }}>⛓️</div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Connecting to Algorand Blockchain</h2>
+          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 20 }}>Fetching decentralized AQI data from the chain...</p>
+          <div style={{ width: 200, height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden', margin: '0 auto' }}>
+            <div style={{ width: '60%', height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: 2, animation: 'loading-bar 1.5s infinite ease-in-out' }} />
+          </div>
+        </div>
+        <style>{`
+          @keyframes loading-bar { 0% { width: 20%; margin-left: 0; } 50% { width: 60%; margin-left: 20%; } 100% { width: 20%; margin-left: 80%; } }
+          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        `}</style>
+      </div>
+    );
+  }
+
+  // ─── Error State: Blockchain unreachable ───
+  if (dataSource === 'error') {
+    return (
+      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0e1a', color: '#fff', fontFamily: 'monospace' }}>
+        <div style={{ textAlign: 'center', maxWidth: 500 }}>
+          <div style={{ fontSize: 48, marginBottom: 20 }}>🔴</div>
+          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, color: '#ef4444' }}>Blockchain Unavailable</h2>
+          <p style={{ fontSize: 14, opacity: 0.7, marginBottom: 16 }}>{blockchainError}</p>
+          <p style={{ fontSize: 12, opacity: 0.5, marginBottom: 24 }}>Make sure AlgoKit LocalNet is running:<br /><code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: 4 }}>algokit localnet start</code></p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{ padding: '10px 24px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600 }}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <div ref={containerRef} className="cesiumContainer" />
+
+      {/* ─── Blockchain Data Source Badge ─── */}
+      <div
+        className="blockchain-badge"
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 14px',
+          borderRadius: 8,
+          backdropFilter: 'blur(12px)',
+          background: dataSource === 'algorand-blockchain'
+            ? 'rgba(16, 185, 129, 0.15)'
+            : dataSource === 'loading'
+              ? 'rgba(59, 130, 246, 0.15)'
+              : 'rgba(245, 158, 11, 0.15)',
+          border: `1px solid ${dataSource === 'algorand-blockchain'
+            ? 'rgba(16, 185, 129, 0.4)'
+            : dataSource === 'loading'
+              ? 'rgba(59, 130, 246, 0.4)'
+              : 'rgba(245, 158, 11, 0.4)'
+            }`,
+          color: '#fff',
+          fontSize: 12,
+          fontFamily: 'monospace',
+          fontWeight: 600,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+        }}
+      >
+        <span
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor:
+              dataSource === 'algorand-blockchain'
+                ? '#10b981'
+                : dataSource === 'loading'
+                  ? '#3b82f6'
+                  : '#f59e0b',
+            animation: dataSource === 'loading' ? 'pulse 1.5s infinite' : 'none',
+          }}
+        />
+        <span>
+          {dataSource === 'algorand-blockchain'
+            ? `⛓️ Algorand Blockchain`
+            : '❌ Error'}
+        </span>
+        {blockchainAppId && (
+          <span style={{ opacity: 0.7, fontSize: 10 }}>
+            App #{blockchainAppId}
+          </span>
+        )}
+        {stationCount > 0 && (
+          <span style={{ opacity: 0.7, fontSize: 10 }}>
+            • {stationCount} stations
+          </span>
+        )}
+      </div>
 
       {/* Eco Toolbox for placing trees, gardens, purifiers */}
       <Toolbox viewer={viewer} />
@@ -819,7 +939,7 @@ function AqiCesiumApp() {
       {/* Atmosphere Simulation Panel */}
       <div className="atmosphere-panel">
         <h3>Atmosphere Simulation</h3>
-        
+
         <div className="atmosphere-item">
           <span>Wind Effect</span>
           <button
@@ -916,28 +1036,33 @@ function AqiCesiumApp() {
       )}
 
       {/* Impact Popup for placements */}
-      <ImpactPopup 
-        impact={currentImpact} 
-        position={impactPosition} 
-        onClose={closeImpactPopup} 
+      <ImpactPopup
+        impact={currentImpact}
+        position={impactPosition}
+        onClose={closeImpactPopup}
       />
 
       {/* Total Impact Panel */}
-      <TotalImpactPanel 
-        summary={calculateTotalImpact(allImpacts)} 
-        onGetQuote={handleGetQuote} 
+      <TotalImpactPanel
+        summary={calculateTotalImpact(allImpacts)}
+        onGetQuote={handleGetQuote}
+      />
+
+      {/* 🌿 Green Rewards Panel — live on-chain balance */}
+      <GreenRewardsPanel
+        refreshTrigger={treeCount}
       />
 
       {/* VR Mode Button */}
       <div className="absolute bottom-5 right-5 z-10">
-        <VRButton 
+        <VRButton
           onEnterVR={() => setIsVRMode(true)}
         />
       </div>
 
       {/* VR Scene Overlay */}
       {isVRMode && viewer && (
-        <ImmersiveVRScene 
+        <ImmersiveVRScene
           viewer={viewer}
           onExitVR={() => setIsVRMode(false)}
         />

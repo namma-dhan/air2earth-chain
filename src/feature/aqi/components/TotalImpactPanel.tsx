@@ -9,7 +9,7 @@ interface TotalImpactPanelProps {
 
 export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onGetQuote }) => {
     const hasAnyPlacements = summary.treesPlaced > 0 || summary.gardenAreaM2 > 0 || summary.purifiersPlaced > 0;
-    
+
     if (!hasAnyPlacements) return null;
 
     return (
@@ -17,7 +17,7 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
             <div className="panel-header">
                 <h3>🌱 Your Clean-Air Plan</h3>
             </div>
-            
+
             <div className="panel-content">
                 {/* Placements Summary */}
                 <div className="placement-summary">
@@ -43,7 +43,7 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
                         </div>
                     )}
                 </div>
-                
+
                 {/* Impact Stats */}
                 <div className="impact-metrics">
                     {summary.totalAqiImprovement > 0 && (
@@ -55,7 +55,7 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
                             </div>
                         </div>
                     )}
-                    
+
                     {summary.totalPm25Reduction > 0 && (
                         <div className="metric-card">
                             <span className="metric-icon">🌬️</span>
@@ -65,7 +65,7 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
                             </div>
                         </div>
                     )}
-                    
+
                     {summary.co2OffsetKgYear > 0 && (
                         <div className="metric-card eco">
                             <span className="metric-icon">🌱</span>
@@ -76,7 +76,7 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
                         </div>
                     )}
                 </div>
-                
+
                 {/* Cost Summary */}
                 <div className="cost-summary">
                     <div className="cost-item total">
@@ -88,10 +88,10 @@ export const TotalImpactPanel: React.FC<TotalImpactPanelProps> = ({ summary, onG
                         <span className="cost-value">{formatCurrency(Math.round(summary.monthlyMaintenance))}</span>
                     </div>
                 </div>
-                
+
                 {/* CTA Button */}
                 <button className="cta-button" onClick={onGetQuote}>
-                    Get Quote 
+                    Get Quote
                 </button>
             </div>
         </div>
