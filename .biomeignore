@@ -1,0 +1,8 @@
+node_modules/
+.next/
+out/
+public/Cesium/
+*.svg
+summa.txt
+errors.txt
+errors_2.txt
