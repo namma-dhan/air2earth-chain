@@ -1,12 +1,10 @@
 
 
 <h2 align="center">
-  <img src="YOUR_IMAGE_URL_HERE" alt="AeroEarth Header" width="700"/>
+  <img src="ascii-art-text.png" alt="AeroEarth Header" width="700"/>
 </h2>>
 
-<h3 align="center" style="color:;">
-  🌍 AeroEarth — Climate × Blockchain
-</h3>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/blockchain-algorand-black.svg?style=flat-square&logo=algorand&logoColor=white" />
