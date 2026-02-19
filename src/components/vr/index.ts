@@ -1,3 +1,3 @@
-export { VRScene, ImmersiveVRScene } from './VRScene';
-export { VRButton } from './VRButton';
-export { useVRMode } from './useVRMode';
+export { useVRMode } from "./useVRMode";
+export { VRButton } from "./VRButton";
+export { ImmersiveVRScene, VRScene } from "./VRScene";
