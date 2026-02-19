@@ -1,9 +1,11 @@
 
-
 <h2 align="center">
   <img src="ascii-art-text.png" alt="AeroEarth Header" width="700"/>
 </h2>>
 
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=28&pause=800&color=27AE60&center=true&vCenter=true&width=800&lines=AeroEarth+%E2%80%94+Climate+%C3%97+Blockchain;3D+Earth+%7C+Green+Actions+%7C+On-Chain+Truth;Sustainable+Web3+Platform" alt="Typing SVG" />
+</p>
 
 
 <p align="center">
