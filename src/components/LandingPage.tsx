@@ -1,5 +1,6 @@
 'use client';
 
+<<<<<<< HEAD
 import { AnimatePresence, motion } from 'framer-motion';
 import gsap from 'gsap';
 import { useRouter } from 'next/navigation';
@@ -13,6 +14,33 @@ const LandingPage = () => {
   const letsGoRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+=======
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useState, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
+import HeroHUD from "./HeroHUD";
+import HeroFeatureOverlay from "./HeroFeatureOverlay";
+import { useLenis } from "../hooks/useLenis";
+
+// Dynamically import the heavy 3D scene to avoid SSR issues
+const HeroTreeScene = dynamic(() => import("./HeroTreeScene"), { ssr: false });
+
+const LandingPage = () => {
+	const router = useRouter();
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+	// Initialize Lenis smooth scroll
+	useLenis();
+
+	const scrollRef = useRef(0);
+	const heroContainerRef = useRef<HTMLDivElement>(null);
+
+	// Callback to update scroll progress for the 3D scene
+	const onScrollProgress = useCallback((p: number) => {
+		scrollRef.current = p;
+	}, []);
+>>>>>>> 0579b40 ([add] landing page)
 
   const features = [
     {
@@ -38,6 +66,7 @@ const LandingPage = () => {
     },
   ];
 
+<<<<<<< HEAD
   const [activeCard, setActiveCard] = useState(0);
   const [activeAqiOption, setActiveAqiOption] = useState('tree');
 
@@ -1826,6 +1855,46 @@ const LandingPage = () => {
           </motion.div>
         </motion.div>
       </div>
+=======
+	const handleBackdropClick = () => {
+		setIsPopupOpen(false);
+	};
+
+	const handleOptionClick = (route: string) => {
+		setIsPopupOpen(false);
+		setTimeout(() => router.push(route), 200);
+	};
+
+	return (
+		<>
+			{/* 
+              400vh container to allow for scroll-driven animations 
+              The content is sticky to the top of the viewport
+            */}
+			<div ref={heroContainerRef} style={{ height: "400vh", position: "relative" }}>
+				<div
+					style={{
+						position: "sticky",
+						top: 0,
+						height: "100vh",
+						width: "100%",
+						overflow: "hidden",
+						backgroundColor: "#050505",
+					}}
+				>
+					<HeroTreeScene scrollProgress={scrollRef} />
+
+					{/* Static HUD elements (Reticle, Enter Button) */}
+					<HeroHUD onLetsGo={() => setIsPopupOpen(true)} />
+
+					{/* Scroll-driven text overlay (GSAP) */}
+					<HeroFeatureOverlay
+						heroRef={heroContainerRef}
+						onScrollProgress={onScrollProgress}
+					/>
+				</div>
+			</div>
+>>>>>>> 0579b40 ([add] landing page)
 
       {/* Popup Menu */}
       <AnimatePresence>
