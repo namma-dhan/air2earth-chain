@@ -50,6 +50,9 @@ const nextConfig = {
 
 export default nextConfig;
 
-// Enable Cloudflare bindings during `next dev`
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-initOpenNextCloudflareForDev();
+// Enable Cloudflare bindings during `next dev` (no-op in CI/production builds)
+if (process.env.NODE_ENV === 'development') {
+  import('@opennextjs/cloudflare')
+    .then(({ initOpenNextCloudflareForDev }) => initOpenNextCloudflareForDev())
+    .catch(() => {});
+}
