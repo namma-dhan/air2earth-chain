@@ -19,7 +19,7 @@ import {
 
 const ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
 // Set Cesium base URL to CDN so assets resolve correctly under webpack/Next.js
-(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
+(window as any).CESIUM_BASE_URL = '/Cesium/';
 Cesium.Ion.defaultAccessToken = ACCESS_TOKEN;
 
 // Station data from API - South India

@@ -16,7 +16,7 @@ import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 // Note: Ensure CESIUM_BASE_URL is set for static assets if using a custom build.
 // For many sandbox environments, we can rely on standard imports.
-(window as any).CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.114.0/Build/Cesium/';
+(window as any).CESIUM_BASE_URL = '/Cesium/';
 
 const CESIUM_ACCESS_TOKEN = process.env.NEXT_PUBLIC_CESIUM_ACCESS_TOKEN || '';
 Cesium.Ion.defaultAccessToken = CESIUM_ACCESS_TOKEN;
