@@ -179,7 +179,6 @@ const WaterPage: React.FC = () => {
       geocoder: false,
       homeButton: false,
       useDefaultRenderLoop: false, // Disable default render loop for WebXR control
-      // @ts-expect-error
       shouldAnimate: true,
     });
 
@@ -358,7 +357,7 @@ const WaterPage: React.FC = () => {
                 if (audio) {
                   if (newState) {
                     audio.volume = Math.min(rainIntensity / 2, 1);
-                    audio.play().catch(() => {});
+                    audio.play().catch(() => { });
                   } else {
                     audio.pause();
                   }

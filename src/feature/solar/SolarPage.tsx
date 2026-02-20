@@ -96,7 +96,6 @@ const SolarPage: React.FC = () => {
       baseLayerPicker: false,
       geocoder: false,
       homeButton: false,
-      // @ts-expect-error
       shouldAnimate: true,
     });
 
