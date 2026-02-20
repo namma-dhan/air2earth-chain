@@ -1,6 +1,6 @@
 
 <h2 align="center">
-  <img src="ascii-art-text.png" alt="AeroEarth Header" width="700"/>
+  <img src="assest/ascii-art-text.png" alt="AeroEarth Header" width="700"/>
 </h2>
 
 <p align="center">
@@ -29,18 +29,18 @@
 
 <!-- 🌍 Main Demo Image Full Width -->
 <p align="center">
-  <img src="demo.png" width="100%" alt="demo"/>
+  <img src="assest/demo.png" width="100%" alt="demo"/>
 </p>
 
 <!-- ☀️ Solar & 💧 Water Full Width Side by Side -->
 <p align="center">
-  <img src="solar.png" width="49%" alt="Solar Dashboard"/>
-  <img src="water.png" width="49%" alt="Water Dashboard"/>
+  <img src="assest/solar.png" width="49%" alt="Solar Dashboard"/>
+  <img src="assest/water.png" width="49%" alt="Water Dashboard"/>
 </p>
 
 <!-- 🌫️ AQI Section Full Width -->
 <p align="center">
-  <img src="aqi.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/aqi.png" width="100%" alt="AQI Dashboard"/>
 </p>
 
 
@@ -65,23 +65,23 @@ AeroEarth fixes both:
 
 
 <h2 align="center">
-  <img src="feature.png" alt="AeroEarth Header" width="700"/>
+  <img src="assest/feature.png" alt="AeroEarth Header" width="700"/>
 </h2>
 AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
 
 
 <p align="center">
-  <img src="f1.png" width="100%" alt="Solar Dashboard"/>
-  <img src="f2.png" width="100%" alt="Water Dashboard"/>
-  <img src="f3.png" width="100&%" alt="Water Dashboard"/>
+  <img src="assest/f1.png" width="100%" alt="Solar Dashboard"/>
+  <img src="assest/f2.png" width="100%" alt="Water Dashboard"/>
+  <img src="assest/f3.png" width="100%" alt="Water Dashboard"/>
 </p>
 
 <p align="center">
-  <img src="solar_feature.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/solar_feature.png" width="100%" alt="AQI Dashboard"/>
 </p>
 
 <p align="center">
-  <img src="water_feature.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/water_feature.png" width="100%" alt="AQI Dashboard"/>
 </p>
 
 <br/>
@@ -103,7 +103,7 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 <br/>
 
 <p align="center">
-  <img src="algo.png" width="20%" alt="AQI Dashboard"/>
+  <img src="assest/algo.png" width="20%" alt="AQI Dashboard"/>
 </p>
 
 
@@ -137,14 +137,14 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 # Architecture
 
 <p align="center">
-  <img src="archi.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/archi.png" width="100%" alt="AQI Dashboard"/>
 </p
 <p align="center">
-  <img src="smartcontract.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/smartcontract.png" width="100%" alt="AQI Dashboard"/>
 </p
 
 <p align="center">
-  <img src="highlevel.png" width="100%" alt="AQI Dashboard"/>
+  <img src="assest/highlevel.png" width="100%" alt="AQI Dashboard"/>
 </p
 
 
