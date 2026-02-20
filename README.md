@@ -71,9 +71,9 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 
 
 <p align="center">
-  <img src="f1.png" width="49%" alt="Solar Dashboard"/>
-  <img src="f2.png" width="49%" alt="Water Dashboard"/>
-  <img src="f3.png" width="49%" alt="Water Dashboard"/>
+  <img src="f1.png" width="100%" alt="Solar Dashboard"/>
+  <img src="f2.png" width="100%" alt="Water Dashboard"/>
+  <img src="f3.png" width="100&%" alt="Water Dashboard"/>
 </p>
 
 <p align="center">
@@ -212,6 +212,15 @@ Open up `http://localhost:3000` and start saving the planet!
 ---
 
 ## 🤝 The Team
-- **[Your Name]** - Blockchain Architect & 3D Engineering (*[LinkedIn Profile Link]*)
-- **[Member 2 Name]** - [Role] (*[LinkedIn Profile Link]*)
-- **[Member 3 Name]** - [Role] (*[LinkedIn Profile Link]*)
+
+- **[SudharshanAIML](https://github.com/SudharshanAIML)** – 3D Modeling & Animations  
+  _3D Models, Visualization, Animations_
+
+- **[@ThiruEigen7](https://github.com/ThiruEigen7)** – Frontend Developer & UI/UX Engineer  
+  _Next.js, React, UI/UX Design, CesiumJS Integration_
+
+- **[@call-meRavi-SHORT-CODE](https://github.com/call-meRavi-SHORT-CODE)** – AI/ML Engineer  
+  _LSTM Models, Heatmap Generation, Environmental Analytics_
+
+- **[@Shashanth27](https://github.com/Shashanth27)** – Blockchain Engineer  
+  _Algorand Smart Contracts, AlgoKit, Web3 Infrastructure_
