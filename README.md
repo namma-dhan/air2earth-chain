@@ -45,7 +45,7 @@
 
 
 
-<h2 align="center">🎯 The Problem We're Solving</h2>
+<h2 align="center">The Problem We're Solving</h2>
 
 <p align="center">
   <img src="https://img.shields.io/badge/❌-Lack_of_Transparency-red?style=for-the-badge"/>
@@ -162,6 +162,12 @@ Compiled directly into AVM bytecode via AlgoKit.
 - **Pitch / Demo Video:** [Insert LinkedIn Post URL Here]
 
 ---
+
+## Archit
+
+<p align="center">
+  <img src="archi.png" width="100%" alt="AQI Dashboard"/>
+</p
 
 
 
