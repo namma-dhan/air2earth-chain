@@ -27,10 +27,6 @@
 
 `AeroChain` Decentralized platform that connects atmospheric intelligence with Earth-scale visualization using blockchain:
 
-<!-- 🌍 Main Demo Image Full Width -->
-<p align="center">
-  <img src="assest/gg.gif" width="70%" alt="demo"/>
-</p>
 
 <!-- ☀️ Solar & 💧 Water Full Width Side by Side -->
 <p align="center">
@@ -67,7 +63,17 @@ AeroEarth fixes both:
 <h2 align="center">
   <img src="assest/feature.png" alt="AeroEarth Header" width="700"/>
 </h2>
-AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
+
+<p align="center">
+  AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
+</p>
+
+<br><br>
+
+<!-- 🌍 Main Demo Image Full Width -->
+<p align="center">
+  <img src="assest/gg.gif" width="70%" alt="demo"/>
+</p>
 
 
 1. **Gamified Climate Action:**  
