@@ -100,15 +100,16 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 
 
 
+<br/>
 
 <p align="center">
-  <img src="algo.png" width="100%" alt="AQI Dashboard"/>
+  <img src="algo.png" width="20%" alt="AQI Dashboard"/>
 </p>
 
 
-<h2 align="center">⚡ Why We Chose Algorand</h2>
+<h2 align="center"> Why We Chose Algorand</h2>
 
-<br/>
+
 
 <!-- Animated Subheading -->
 <p align="center">
@@ -133,12 +134,11 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 
 ---
 
-## Archit
+# Architecture
 
 <p align="center">
   <img src="archi.png" width="100%" alt="AQI Dashboard"/>
 </p
-
 <p align="center">
   <img src="smartcontract.png" width="100%" alt="AQI Dashboard"/>
 </p
