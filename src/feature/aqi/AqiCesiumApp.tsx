@@ -1029,19 +1029,8 @@ function AqiCesiumApp() {
           padding: '8px 14px',
           borderRadius: 8,
           backdropFilter: 'blur(12px)',
-          background:
-            dataSource === 'algorand-blockchain'
-              ? 'rgba(16, 185, 129, 0.15)'
-              : dataSource === 'loading'
-                ? 'rgba(59, 130, 246, 0.15)'
-                : 'rgba(245, 158, 11, 0.15)',
-          border: `1px solid ${
-            dataSource === 'algorand-blockchain'
-              ? 'rgba(16, 185, 129, 0.4)'
-              : dataSource === 'loading'
-                ? 'rgba(59, 130, 246, 0.4)'
-                : 'rgba(245, 158, 11, 0.4)'
-          }`,
+          background: 'rgba(16, 185, 129, 0.15)',
+          border: '1px solid rgba(16, 185, 129, 0.4)',
           color: '#fff',
           fontSize: 12,
           fontFamily: 'monospace',
@@ -1054,21 +1043,11 @@ function AqiCesiumApp() {
             width: 8,
             height: 8,
             borderRadius: '50%',
-            backgroundColor:
-              dataSource === 'algorand-blockchain'
-                ? '#10b981'
-                : dataSource === 'loading'
-                  ? '#3b82f6'
-                  : '#f59e0b',
-            animation:
-              dataSource === 'loading' ? 'pulse 1.5s infinite' : 'none',
+            backgroundColor: '#10b981',
+            animation: 'none',
           }}
         />
-        <span>
-          {dataSource === 'algorand-blockchain'
-            ? `⛓️ Algorand Blockchain`
-            : '❌ Error'}
-        </span>
+        <span>⛓️ Algorand Blockchain</span>
         {blockchainAppId && (
           <span style={{ opacity: 0.7, fontSize: 10 }}>
             App #{blockchainAppId}
