@@ -213,7 +213,7 @@ Open up `http://localhost:3000` and start saving the planet!
 
 ## 🤝 The Team
 
-- **[SudharshanAIML](https://github.com/SudharshanAIML)** – 3D Modeling & Animations  
+- **[@SudharshanAIML](https://github.com/SudharshanAIML)** – 3D Modeling & Animations  
   _3D Models, Visualization, Animations_
 
 - **[@ThiruEigen7](https://github.com/ThiruEigen7)** – Frontend Developer & UI/UX Engineer  
