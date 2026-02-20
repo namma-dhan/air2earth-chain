@@ -77,11 +77,11 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 </p>
 
 <p align="center">
-  <img src="solar-feature.png" width="100%" alt="AQI Dashboard"/>
+  <img src="solar_feature.png" width="100%" alt="AQI Dashboard"/>
 </p>
 
 <p align="center">
-  <img src="water-feature" width="100%" alt="AQI Dashboard"/>
+  <img src="water_feature.png" width="100%" alt="AQI Dashboard"/>
 </p>
 
 <br/>
