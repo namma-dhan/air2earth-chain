@@ -29,7 +29,7 @@
 
 <!-- 🌍 Main Demo Image Full Width -->
 <p align="center">
-  <img src="assest/demo.png" width="100%" alt="demo"/>
+  <img src="assest/gg.gif" width="70%" alt="demo"/>
 </p>
 
 <!-- ☀️ Solar & 💧 Water Full Width Side by Side -->
@@ -68,23 +68,6 @@ AeroEarth fixes both:
   <img src="assest/feature.png" alt="AeroEarth Header" width="700"/>
 </h2>
 AeroEarth addresses the core challenges of climate action by combining engagement with verifiable accountability.
-
-
-<p align="center">
-  <img src="assest/f1.png" width="100%" alt="Solar Dashboard"/>
-  <img src="assest/f2.png" width="100%" alt="Water Dashboard"/>
-  <img src="assest/f3.png" width="100%" alt="Water Dashboard"/>
-</p>
-
-<p align="center">
-  <img src="assest/solar_feature.png" width="100%" alt="AQI Dashboard"/>
-</p>
-
-<p align="center">
-  <img src="assest/water_feature.png" width="100%" alt="AQI Dashboard"/>
-</p>
-
-<br/>
 
 
 1. **Gamified Climate Action:**  
@@ -127,10 +110,6 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:27AE60,100:00FFB3&height=120&section=footer"/>
 </p>
-
-## 🔗 Live Links & Demo
-- **Live Demo URL:** [Insert Vercel/Netlify Link Here]
-- **Pitch / Demo Video:** [Insert LinkedIn Post URL Here]
 
 ---
 
