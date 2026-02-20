@@ -134,6 +134,34 @@ AeroEarth fixes both:
 
 
 
+## 🤗 LSTM Models — Hugging Face Spaces
+
+<p align="center">
+  <a href="https://huggingface.co/spaces/Ravikrishna-25/AQL-model">
+    <img src="https://img.shields.io/badge/huggingface-aqi_lstm_model-FFD21E.svg?style=flat-square&logo=huggingface&logoColor=black" />
+  </a>
+
+  <a href="https://huggingface.co/spaces/Ravikrishna-25/Water-LSTM">
+    <img src="https://img.shields.io/badge/huggingface-water_lstm_model-36B5FF.svg?style=flat-square&logo=huggingface&logoColor=black" />
+  </a>
+
+  <a href="https://huggingface.co/spaces/Ravikrishna-25/Solar-LSTM">
+    <img src="https://img.shields.io/badge/huggingface-solar_lstm_model-FF6F00.svg?style=flat-square&logo=huggingface&logoColor=black" />
+  </a>
+</p>
+
+<div align="center">
+
+| Model | Description | Space |
+|:------|:------------|:-----:|
+| 🌫️ **AQI LSTM** | Air Quality Index prediction using LSTM neural network | [Live Demo ➜](https://huggingface.co/spaces/Ravikrishna-25/AQL-model) |
+| 💧 **Water LSTM** | Water quality forecasting with time-series deep learning | [Live Demo ➜](https://huggingface.co/spaces/Ravikrishna-25/Water-LSTM) |
+| ☀️ **Solar LSTM** | Solar energy output prediction using sequential models | [Live Demo ➜](https://huggingface.co/spaces/Ravikrishna-25/Solar-LSTM) |
+
+</div>
+
+---
+
 ## 🛠 Tech Stack
 - **Blockchain:** Algorand (AVM), Algorand TypeScript, PuyaTs
 - **Developer Tooling:** AlgoKit, Lora Explorer, `@algorandfoundation/algokit-utils`
@@ -195,17 +223,41 @@ Open up `http://localhost:3000` and start saving the planet!
 - **Roadmap - Web3 Wallets:** Right now, the system tracks sessions and proxy addresses. Next up is native Pera Wallet / Defly integration so users hold their Green Points directly in their own wallets.
 
 ---
+<p align="center">
+  🤝 Contributors
+</p>
 
-## 🤝 The Team
 
-- **[@SudharshanAIML](https://github.com/SudharshanAIML)** – 3D Modeling & Animations  
-  _3D Models, Visualization, Animations_
 
-- **[@ThiruEigen7](https://github.com/ThiruEigen7)** – Frontend Developer & UI/UX Engineer  
-  _Next.js, React, UI/UX Design, CesiumJS Integration_
-
-- **[@call-meRavi-SHORT-CODE](https://github.com/call-meRavi-SHORT-CODE)** – AI/ML Engineer  
-  _LSTM Models, Heatmap Generation, Environmental Analytics_
-
-- **[@Shashanth27](https://github.com/Shashanth27)** – Blockchain Engineer  
-  _Algorand Smart Contracts, AlgoKit, Web3 Infrastructure_
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/SudharshanAIML">
+        <img src="https://github.com/SudharshanAIML.png" width="100px;" alt="Sudharshan" style="border-radius:50%;" /><br />
+        <sub><b>@SudharshanAIML</b></sub>
+      </a><br />
+      <sub>3D Modeling & Animations</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/ThiruEigen7">
+        <img src="https://github.com/ThiruEigen7.png" width="100px;" alt="ThiruEigen7" style="border-radius:50%;" /><br />
+        <sub><b>@ThiruEigen7</b></sub>
+      </a><br />
+      <sub>Frontend & UI/UX Engineer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/call-meRavi-SHORT-CODE">
+        <img src="https://github.com/call-meRavi-SHORT-CODE.png" width="100px;" alt="Ravikrishna" style="border-radius:50%;" /><br />
+        <sub><b>@call-meRavi-SHORT-CODE</b></sub>
+      </a><br />
+      <sub>AI/ML Engineer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Shashanth27">
+        <img src="https://github.com/Shashanth27.png" width="100px;" alt="Shashanth" style="border-radius:50%;" /><br />
+        <sub><b>@Shashanth27</b></sub>
+      </a><br />
+      <sub>Blockchain Engineer</sub>
+    </td>
+  </tr>
+</table>
