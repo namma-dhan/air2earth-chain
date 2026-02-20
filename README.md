@@ -169,6 +169,14 @@ Compiled directly into AVM bytecode via AlgoKit.
   <img src="archi.png" width="100%" alt="AQI Dashboard"/>
 </p
 
+<p align="center">
+  <img src="smartcontract.png" width="100%" alt="AQI Dashboard"/>
+</p
+
+<p align="center">
+  <img src="highlevel.png" width="100%" alt="AQI Dashboard"/>
+</p
+
 
 
 ## 🛠 Tech Stack
