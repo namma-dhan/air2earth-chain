@@ -115,42 +115,12 @@ AeroEarth addresses the core challenges of climate action by combining engagemen
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=00FFB3&center=true&vCenter=true&width=800&lines=Green+Blockchain+for+a+Green+Planet.;Speed.+Scalability.+Sustainability." />
 </p>
 
-<br/>
-
-<h3 align="center">🌱 Carbon Negative & Fast</h3>
-
-<p align="center">
-Carbon-negative blockchain with sub-3-second finality.<br/>
-Building an eco dApp on an energy-hungry chain makes zero sense.
-</p>
-
-<br/>
-
-<h3 align="center">💸 Ultra-Low Transaction Fees</h3>
-
-<p align="center">
-~0.001 ALGO per transaction — perfect for logging thousands of environmental actions.
-</p>
-
-<br/>
-
-<h3 align="center">📦 Box Storage (BoxMap)</h3>
-
-<p align="center">
-Unlimited on-chain map storage with O(1) read access.<br/>
-No centralized database required.
-</p>
-
-<br/>
-
-<h3 align="center">🧠 TypeScript Smart Contracts (PuyaTs)</h3>
-
-<p align="center">
-Smart contracts written fully in TypeScript.<br/>
-Compiled directly into AVM bytecode via AlgoKit.
-</p>
-
-<br/>
+<ul>
+  <li><b> Carbon Negative & Fast:</b> Carbon-negative blockchain with sub-3-second finality. Building an eco dApp on an energy-hungry chain makes zero sense.</li>
+  <li><b> Ultra-Low Transaction Fees:</b> ~0.001 ALGO per transaction — perfect for logging thousands of environmental actions.</li>
+  <li><b> Box Storage (BoxMap):</b> Unlimited on-chain map storage with O(1) read access. No centralized database required.</li>
+  <li><b> TypeScript Smart Contracts (PuyaTs):</b> Smart contracts written fully in TypeScript, compiled directly into AVM bytecode via AlgoKit.</li>
+</ul>
 
 <!-- Footer Wave -->
 <p align="center">
